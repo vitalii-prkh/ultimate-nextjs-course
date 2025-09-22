@@ -1,7 +1,7 @@
+import React from "react";
 import type {Metadata} from "next";
 import {Inter, Space_Grotesk} from "next/font/google";
 import Theme from "@/context/Theme";
-import {Navbar} from "@/components/navigation/navbar";
 import "./globals.css";
 
 const inter = Inter({
@@ -42,7 +42,6 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Navbar />
           {children}
         </Theme>
       </body>
