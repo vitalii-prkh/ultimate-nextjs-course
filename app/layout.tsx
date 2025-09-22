@@ -1,7 +1,10 @@
 import React from "react";
 import type {Metadata} from "next";
 import {Inter, Space_Grotesk} from "next/font/google";
+import {SessionProvider} from "next-auth/react";
 import Theme from "@/context/Theme";
+import {auth} from "@/auth";
+import {Toaster} from "@/components/ui/sonner";
 import "./globals.css";
 
 const inter = Inter({
@@ -23,28 +26,35 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
+type RootLayoutProps = Readonly<{
   children: React.ReactNode;
-}>) {
+}>;
+
+async function RootLayout({children}: RootLayoutProps) {
+  const session = await auth();
+
   return (
     <html
       lang="en"
       suppressHydrationWarning
     >
-      <body
-        className={`${inter.className} ${spaceGrotesk.variable} antialiased`}
-      >
-        <Theme
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
+      <SessionProvider session={session}>
+        <body
+          className={`${inter.className} ${spaceGrotesk.variable} antialiased`}
         >
-          {children}
-        </Theme>
-      </body>
+          <Theme
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </Theme>
+          <Toaster richColors />
+        </body>
+      </SessionProvider>
     </html>
   );
 }
+
+export default RootLayout;
