@@ -1,5 +1,9 @@
+"use client";
+
+import {FormSignUp} from "@/components/forms/FormSignUp";
+
 function PageSignUp() {
-  return <div>PageSignUp</div>;
+  return <FormSignUp />;
 }
 
 export default PageSignUp;
