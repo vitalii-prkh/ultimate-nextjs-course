@@ -91,8 +91,7 @@ export function RightNav() {
               key={tag._id}
               _id={tag._id}
               name={tag.name}
-              questions={tag.questions}
-              showCount
+              count={tag.questions}
               compact
             />
           ))}

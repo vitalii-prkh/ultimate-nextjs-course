@@ -3,6 +3,7 @@ import {ROUTES} from "@/refs/routes";
 import {Button} from "@/components/ui/button";
 import {LocalSearch} from "@/components/search/LocalSearch";
 import {HomeTags} from "@/components/filters/HomeTags";
+import {CardQuestion} from "@/components/cards/CardQuestion";
 
 const questions = [
   {
@@ -22,6 +23,7 @@ const questions = [
     author: {
       _id: "1",
       name: "John Doe",
+      image: "/placeholders/150.jpeg",
     },
     upvotes: 10,
     answers: 5,
@@ -45,6 +47,7 @@ const questions = [
     author: {
       _id: "1",
       name: "John Doe",
+      image: "/placeholders/150.jpeg",
     },
     upvotes: 10,
     answers: 5,
@@ -89,7 +92,10 @@ async function PageHome(props: PageHomeProps) {
       <HomeTags />
       <div className="mt-10 flex w-full flex-col gap-6">
         {filteredQuestions.map((question) => (
-          <h1 key={question._id}>{question.title}</h1>
+          <CardQuestion
+            key={question._id}
+            data={question}
+          />
         ))}
       </div>
     </>

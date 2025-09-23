@@ -7,8 +7,7 @@ import {getDevIconClassName} from "@/lib/utils";
 type CardTagProps = {
   _id: string;
   name: string;
-  questions?: number;
-  showCount?: boolean;
+  count?: number;
   compact?: boolean;
 };
 
@@ -24,8 +23,8 @@ export function CardTag(props: CardTagProps) {
           <span>{props.name}</span>
         </div>
       </Badge>
-      {props.showCount && (
-        <p className="small-medium text-dark500_light700">{props.questions}</p>
+      {props.count != null && (
+        <p className="small-medium text-dark500_light700">{props.count}</p>
       )}
     </Link>
   );
