@@ -4,8 +4,11 @@ export const ROUTES = {
   COLLECTIONS: "/collections",
   JOBS: "/jobs",
   TAGS: "/tags",
+  TAG_BY_ID: "/tags/[tagId]",
   PROFILE_BY_ID: "/profile/[profileId]",
   ASK_QUESTION: "/ask-question",
+  QUESTIONS: "/questions",
+  QUESTION_BY_ID: "/questions/[questionId]",
   SIGN_IN: "/sign-in",
   SIGN_UP: "/sign-up",
 } as const;
