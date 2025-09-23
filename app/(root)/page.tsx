@@ -2,6 +2,7 @@ import Link from "next/link";
 import {ROUTES} from "@/refs/routes";
 import {Button} from "@/components/ui/button";
 import {LocalSearch} from "@/components/search/LocalSearch";
+import {HomeTags} from "@/components/filters/HomeTags";
 
 const questions = [
   {
@@ -11,11 +12,11 @@ const questions = [
     tags: [
       {
         _id: "1",
-        name: "react",
+        name: "vue",
       },
       {
         _id: "2",
-        name: "typescript",
+        name: "javascript",
       },
     ],
     author: {
@@ -53,16 +54,18 @@ const questions = [
 ];
 
 type PageHomeProps = {
-  searchParams: Promise<{query?: string}>;
+  searchParams: Promise<{query?: string; tag?: string}>;
 };
 
 async function PageHome(props: PageHomeProps) {
-  const {query = ""} = await props.searchParams;
-  const filteredQuestions = query
-    ? questions.filter((question) =>
-        question.title.toLowerCase().includes(query.toLowerCase()),
-      )
-    : questions;
+  const {query = "", tag = ""} = await props.searchParams;
+  const byText = (candidate: string, text: string) =>
+    candidate.toLowerCase().includes(text.toLowerCase());
+  const byTags = <Tag extends {name: string}>(tags: Tag[], text: string) =>
+    tags.some((tag) => byText(tag.name, text));
+  const filteredQuestions = questions.filter(
+    (question) => byText(question.title, query) && byTags(question.tags, tag),
+  );
 
   return (
     <>
@@ -83,7 +86,7 @@ async function PageHome(props: PageHomeProps) {
           className="flex-1"
         />
       </section>
-      HomeFilter
+      <HomeTags />
       <div className="mt-10 flex w-full flex-col gap-6">
         {filteredQuestions.map((question) => (
           <h1 key={question._id}>{question.title}</h1>
