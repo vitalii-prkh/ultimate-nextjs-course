@@ -6,6 +6,7 @@ import {standardSchemaResolver} from "@hookform/resolvers/standard-schema";
 import {schemaAskQuestion} from "@/lib/validations";
 import {Form, FormField} from "@/components/ui/form";
 import {InputText} from "@/components/InputText";
+import {InputEditor} from "@/components/InputEditor";
 import {FormSubmit} from "@/components/FormSubmit";
 
 type FormAskQuestionValues = z.infer<typeof schemaAskQuestion>;
@@ -46,7 +47,7 @@ export function FormQuestion() {
           control={form.control}
           name="content"
           render={({field}) => (
-            <InputText
+            <InputEditor
               {...field}
               required
               label="Detailed explanation of your problem"

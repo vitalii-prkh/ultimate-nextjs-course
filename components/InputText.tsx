@@ -17,16 +17,12 @@ type InputTextProps = Omit<
 };
 
 export function InputText(props: InputTextProps) {
-  const id = React.useId();
   const {label, ...rest} = props;
 
   return (
     <FormItem className="flex w-full flex-col gap-2.5">
       {label && (
-        <FormLabel
-          htmlFor={id}
-          className="paragraph-medium text-dark400_light700"
-        >
+        <FormLabel className="paragraph-medium text-dark400_light700">
           {props.label}
           {props.required && <span className="text-primary-500">{" *"}</span>}
         </FormLabel>
@@ -34,7 +30,6 @@ export function InputText(props: InputTextProps) {
       <FormControl>
         <Input
           {...rest}
-          id={id}
           type="text"
           className="paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 no-focus rounded-1.5 min-h-12 border"
         />
