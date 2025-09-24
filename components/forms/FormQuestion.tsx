@@ -39,7 +39,7 @@ export function FormQuestion() {
               {...field}
               required
               label="Question Title"
-              placeholder="example@email.com"
+              placeholder="Enter a title"
               description="Be specific and imagine you are asking a question to another person."
             />
           )}
