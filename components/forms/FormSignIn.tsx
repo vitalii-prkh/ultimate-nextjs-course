@@ -49,7 +49,10 @@ export function FormSignIn() {
             />
           )}
         />
-        <FormSubmit disabled={form.formState.isSubmitting}>
+        <FormSubmit
+          fullWidth
+          disabled={form.formState.isSubmitting}
+        >
           {form.formState.isSubmitting ? "Signing In..." : "Sign In"}
         </FormSubmit>
         <p>
