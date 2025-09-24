@@ -16,7 +16,7 @@ type InputTextProps = Omit<
   description?: string;
 };
 
-export function InputText(props: InputTextProps) {
+export function InputTags(props: InputTextProps) {
   const {label, required, description, ...rest} = props;
 
   return (

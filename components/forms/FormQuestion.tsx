@@ -7,6 +7,7 @@ import {schemaAskQuestion} from "@/lib/validations";
 import {Form, FormField} from "@/components/ui/form";
 import {InputText} from "@/components/InputText";
 import {InputEditor} from "@/components/InputEditor";
+import {InputTags} from "@/components/InputTags";
 import {FormSubmit} from "@/components/FormSubmit";
 
 type FormAskQuestionValues = z.infer<typeof schemaAskQuestion>;
@@ -60,7 +61,7 @@ export function FormQuestion() {
           control={form.control}
           name="tags"
           render={({field}) => (
-            <InputText
+            <InputTags
               {...field}
               required
               label="Tags"
