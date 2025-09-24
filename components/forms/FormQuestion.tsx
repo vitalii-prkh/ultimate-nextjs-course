@@ -67,6 +67,13 @@ export function FormQuestion() {
               label="Tags"
               placeholder="Add tags ..."
               description="Add up to 3 tags to describe what your question is about."
+              onKeyDownEnter={(message) => {
+                if (message == null) {
+                  form.clearErrors("tags");
+                } else {
+                  form.setError("tags", {type: "manual", message});
+                }
+              }}
             />
           )}
         />
