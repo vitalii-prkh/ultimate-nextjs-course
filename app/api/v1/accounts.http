@@ -34,3 +34,10 @@ PUT {{api_endpoint}}/accounts/{{accountId}}
 
 ### Delete account by id
 DELETE {{api_endpoint}}/accounts/{{accountId}}
+
+### Get account by provider id
+POST {{api_endpoint}}/accounts/{{providerAccountId}}
+
+{
+  "providerAccountId": "{{providerAccountId}}"
+}
