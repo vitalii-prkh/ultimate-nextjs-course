@@ -1,6 +1,9 @@
 import {InferSchemaType, Schema, model, models} from "mongoose";
+import {RecordWith_id} from "@/db/types.util";
 
-export type TCollection = InferSchemaType<typeof schema>;
+export type TCollectionType = InferSchemaType<typeof schema>;
+
+export type TCollection = RecordWith_id<TCollectionType>;
 
 const schema = new Schema(
   {
@@ -21,6 +24,6 @@ const schema = new Schema(
 );
 
 const Collection =
-  models?.Collection || model<TCollection>("Collection", schema);
+  models?.Collection || model<TCollectionType>("Collection", schema);
 
 export default Collection;

@@ -1,4 +1,5 @@
 import {InferSchemaType, Schema, model, models} from "mongoose";
+import {RecordWith_id} from "@/db/types.util";
 
 export const InteractionActionEnums = [
   "view",
@@ -11,7 +12,9 @@ export const InteractionActionEnums = [
   "search",
 ] as const;
 
-export type TInteraction = InferSchemaType<typeof schema>;
+export type TInteractionType = InferSchemaType<typeof schema>;
+
+export type TInteractionData = RecordWith_id<TInteractionType>;
 
 const schema = new Schema(
   {
@@ -42,6 +45,6 @@ const schema = new Schema(
 );
 
 const Interaction =
-  models?.Interaction || model<TInteraction>("Interaction", schema);
+  models?.Interaction || model<TInteractionType>("Interaction", schema);
 
 export default Interaction;

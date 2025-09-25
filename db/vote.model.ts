@@ -1,6 +1,9 @@
 import {InferSchemaType, Schema, model, models} from "mongoose";
+import {RecordWith_id} from "@/db/types.util";
 
-export type TVote = InferSchemaType<typeof schema>;
+export type TVoteType = InferSchemaType<typeof schema>;
+
+export type TVoteData = RecordWith_id<TVoteType>;
 
 const schema = new Schema(
   {
@@ -29,6 +32,6 @@ const schema = new Schema(
   },
 );
 
-const Vote = models?.Vote || model<TVote>("Vote", schema);
+const Vote = models?.Vote || model<TVoteType>("Vote", schema);
 
 export default Vote;

@@ -1,6 +1,9 @@
 import {InferSchemaType, Schema, model, models} from "mongoose";
+import {RecordWith_id} from "@/db/types.util";
 
-export type TTagQuestion = InferSchemaType<typeof schema>;
+export type TTagQuestionType = InferSchemaType<typeof schema>;
+
+export type TTagQuestionData = RecordWith_id<TTagQuestionType>;
 
 const schema = new Schema(
   {
@@ -21,6 +24,6 @@ const schema = new Schema(
 );
 
 const TagQuestion =
-  models?.TagQuestion || model<TTagQuestion>("TagQuestion", schema);
+  models?.TagQuestion || model<TTagQuestionType>("TagQuestion", schema);
 
 export default TagQuestion;

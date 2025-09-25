@@ -1,6 +1,9 @@
 import {InferSchemaType, Schema, model, models} from "mongoose";
+import {RecordWith_id} from "@/db/types.util";
 
-export type TUser = InferSchemaType<typeof schema>;
+export type TUserType = InferSchemaType<typeof schema>;
+
+export type TUserData = RecordWith_id<TUserType>;
 
 const schema = new Schema(
   {
@@ -40,6 +43,6 @@ const schema = new Schema(
   },
 );
 
-const User = models?.User || model<TUser>("User", schema);
+const User = models?.User || model<TUserType>("User", schema);
 
 export default User;

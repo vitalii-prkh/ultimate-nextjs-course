@@ -1,6 +1,9 @@
 import {InferSchemaType, Schema, model, models} from "mongoose";
+import {RecordWith_id} from "@/db/types.util";
 
-export type TAccount = InferSchemaType<typeof schema>;
+export type TAccountType = InferSchemaType<typeof schema>;
+
+export type TAccountData = RecordWith_id<TAccountType>;
 
 const schema = new Schema(
   {
@@ -33,6 +36,6 @@ const schema = new Schema(
   },
 );
 
-const Account = models?.Account || model<TAccount>("Account", schema);
+const Account = models?.Account || model<TAccountType>("Account", schema);
 
 export default Account;

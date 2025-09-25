@@ -1,6 +1,9 @@
 import {InferSchemaType, Schema, model, models} from "mongoose";
+import {RecordWith_id} from "@/db/types.util";
 
-export type TAnswer = InferSchemaType<typeof schema>;
+export type TAnswerType = InferSchemaType<typeof schema>;
+
+export type TAnswerData = RecordWith_id<TAnswerType>;
 
 const schema = new Schema(
   {
@@ -32,6 +35,6 @@ const schema = new Schema(
   },
 );
 
-const Answer = models?.Answer || model<TAnswer>("Answer", schema);
+const Answer = models?.Answer || model<TAnswerType>("Answer", schema);
 
 export default Answer;
