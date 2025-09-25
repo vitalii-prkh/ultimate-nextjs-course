@@ -16,3 +16,21 @@ POST {{api_endpoint}}/accounts
 
 ### Get all accounts
 GET {{api_endpoint}}/accounts
+
+### Get account by id
+GET {{api_endpoint}}/accounts/{{accountId}}
+
+### Update account by id
+PUT {{api_endpoint}}/accounts/{{accountId}}
+
+{
+  "userId": "{{userId}}",
+  "name": "{{name}}",
+  "image": "{{image}}",
+  "password": "{{password}}",
+  "provider": "{{provider}}",
+  "providerAccountId": "{{providerAccountId}}"
+}
+
+### Delete account by id
+DELETE {{api_endpoint}}/accounts/{{accountId}}

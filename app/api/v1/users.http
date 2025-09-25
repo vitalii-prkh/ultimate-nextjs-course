@@ -27,6 +27,15 @@ GET {{api_endpoint}}/users
 ### Get user by id
 GET {{api_endpoint}}/users/{{userId}}
 
+### Update user by id
+PUT {{api_endpoint}}/users/{{userId}}
+
+{
+  "name": "{{name}}",
+  "username": "{{username}}",
+  "email": "{{email}}"
+}
+
 ### Delete user by id
 DELETE {{api_endpoint}}/users/{{userId}}
 
