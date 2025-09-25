@@ -1,0 +1,38 @@
+### Create a user
+< {%
+  const firstName = 'Mykola'
+  const lastName  = 'Kravchenko'
+  const username = `${firstName.toLowerCase()}.${lastName.toLowerCase()}`
+
+  request.variables.set("name", `${firstName} ${lastName}`)
+  request.variables.set("username", username)
+  request.variables.set("email", `${username}@example.com`)
+%}
+
+POST {{api_endpoint}}/users
+
+{
+  "name": "{{name}}",
+  "username": "{{username}}",
+  "email": "{{email}}"
+}
+
+> {%
+  client.global.set("userId", response.body.data._id)
+%}
+
+### Get all users
+GET {{api_endpoint}}/users
+
+### Get user by id
+GET {{api_endpoint}}/users/{{userId}}
+
+### Delete user by id
+DELETE {{api_endpoint}}/users/{{userId}}
+
+### Get user by email
+POST {{api_endpoint}}/users/email
+
+{
+  "email": "{{email}}"
+}
