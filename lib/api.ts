@@ -1,4 +1,4 @@
-import {fetchHandler as fetch} from "@/lib/fetch";
+import {fetchHandler as fetch} from "@/lib/handlers/fetch";
 import {TAccountData, TAccountType} from "@/db/account.model";
 import {TUserData, TUserType} from "@/db/user.model";
 
