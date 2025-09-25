@@ -1,9 +1,8 @@
-import {InferSchemaType, Schema, model, models} from "mongoose";
-import {RecordWith_id} from "@/db/types.util";
+import {InferSchemaType, Require_id, Schema, model, models} from "mongoose";
 
 export type TTagType = InferSchemaType<typeof schema>;
 
-export type TTagData = RecordWith_id<TTagType>;
+export type TTagData = Require_id<TTagType>;
 
 const schema = new Schema(
   {

@@ -1,9 +1,8 @@
-import {InferSchemaType, Schema, model, models} from "mongoose";
-import {RecordWith_id} from "@/db/types.util";
+import {InferSchemaType, Require_id, Schema, model, models} from "mongoose";
 
 export type TVoteType = InferSchemaType<typeof schema>;
 
-export type TVoteData = RecordWith_id<TVoteType>;
+export type TVoteData = Require_id<TVoteType>;
 
 const schema = new Schema(
   {

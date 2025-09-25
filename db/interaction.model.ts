@@ -1,5 +1,4 @@
-import {InferSchemaType, Schema, model, models} from "mongoose";
-import {RecordWith_id} from "@/db/types.util";
+import {InferSchemaType, Require_id, Schema, model, models} from "mongoose";
 
 export const InteractionActionEnums = [
   "view",
@@ -14,7 +13,7 @@ export const InteractionActionEnums = [
 
 export type TInteractionType = InferSchemaType<typeof schema>;
 
-export type TInteractionData = RecordWith_id<TInteractionType>;
+export type TInteractionData = Require_id<TInteractionType>;
 
 const schema = new Schema(
   {
