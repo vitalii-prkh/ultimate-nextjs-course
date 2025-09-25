@@ -57,7 +57,7 @@ export const api = {
       return fetch<TAccountData>(`${baseUrl}/accounts/${accountId}`);
     },
     getByProvider(providerAccountId: string) {
-      return fetch<TAccountData>(`${baseUrl}/accounts/email`, {
+      return fetch<TAccountData>(`${baseUrl}/accounts/provider`, {
         method: "POST",
         body: JSON.stringify({providerAccountId}),
       });
