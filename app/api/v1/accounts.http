@@ -1,0 +1,18 @@
+### Create an account
+POST {{api_endpoint}}/accounts
+
+{
+  "userId": "{{userId}}",
+  "name": "{{name}}",
+  "image": "{{image}}",
+  "password": "{{password}}",
+  "provider": "{{provider}}",
+  "providerAccountId": "{{providerAccountId}}"
+}
+
+> {%
+  client.global.set("accountId", response.body.data._id)
+%}
+
+### Get all accounts
+GET {{api_endpoint}}/accounts
