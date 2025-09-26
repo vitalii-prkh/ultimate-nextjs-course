@@ -113,3 +113,11 @@ export const schemaSignInWithOAuth = z.object({
     image: z.url("Invalid image URL").optional(),
   }),
 });
+
+export const schemaSearchParams = z.object({
+  page: z.number().min(1, "Page must be at least 1").default(1),
+  pageSize: z.number().min(1, "Page size must be at least 1").default(10),
+  query: z.string().optional(),
+  filter: z.string().optional(),
+  sort: z.string().optional(),
+});
