@@ -11,12 +11,13 @@ import {isActivePath} from "@/lib/path/isActivePath";
 import {SheetClose} from "@/components/ui/sheet";
 
 type NavLinksProps = {
+  profileId?: string;
   isMobile?: boolean;
 };
 
 export function NavLinks(props: NavLinksProps) {
   const pathname = usePathname();
-  const profileId = undefined;
+  const {profileId} = props;
 
   return (
     <React.Fragment>
