@@ -1,8 +1,15 @@
 "use client";
 
-import {useForm} from "react-hook-form";
+import React from "react";
+import {useRouter} from "next/navigation";
+import {useForm, SubmitHandler} from "react-hook-form";
+import {Loader} from "lucide-react";
+import {toast} from "sonner";
 import {z} from "zod";
 import {standardSchemaResolver} from "@hookform/resolvers/standard-schema";
+import {ROUTES} from "@/refs/routes";
+import {buildPath} from "@/lib/path/buildPath";
+import {createQuestion} from "@/lib/actions/question.actions";
 import {schemaAskQuestion} from "@/lib/validations";
 import {Form, FormField} from "@/components/ui/form";
 import {InputText} from "@/components/InputText";
@@ -13,6 +20,8 @@ import {FormSubmit} from "@/components/FormSubmit";
 type FormAskQuestionValues = z.infer<typeof schemaAskQuestion>;
 
 export function FormQuestion() {
+  const router = useRouter();
+  const [isPending, startTransition] = React.useTransition();
   const form = useForm<FormAskQuestionValues>({
     defaultValues: {
       title: "",
@@ -21,8 +30,24 @@ export function FormQuestion() {
     },
     resolver: standardSchemaResolver(schemaAskQuestion),
   });
-  const handleSubmit = (values: FormAskQuestionValues) => {
-    console.log(values);
+  const handleSubmit: SubmitHandler<FormAskQuestionValues> = async (values) => {
+    startTransition(async () => {
+      const result = await createQuestion(values);
+
+      if (result.success) {
+        toast.success("Success", {
+          description: "Question created successfully.",
+        });
+
+        router.push(
+          buildPath(ROUTES.QUESTION_BY_ID, {questionId: result.data._id}),
+        );
+      } else {
+        toast.error(`Error ${result?.status}`, {
+          description: result?.error?.message,
+        });
+      }
+    });
   };
 
   return (
@@ -78,8 +103,14 @@ export function FormQuestion() {
           )}
         />
         <div className="mt-16 flex justify-end">
-          <FormSubmit disabled={form.formState.isSubmitting}>
-            Ask A Question
+          <FormSubmit disabled={isPending}>
+            {isPending && (
+              <React.Fragment>
+                <Loader className="mr-2 size-4 animate-spin" />
+                Submitting...
+              </React.Fragment>
+            )}
+            {!isPending && "Ask A Question"}
           </FormSubmit>
         </div>
       </form>
