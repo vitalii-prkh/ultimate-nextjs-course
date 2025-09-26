@@ -1,9 +1,54 @@
 import NextAuth from "next-auth";
 import GitHub from "next-auth/providers/github";
+import Credentials from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
 import {api} from "@/lib/api";
+import {schemaSignIn} from "@/lib/validations";
 
 export const {handlers, signIn, signOut, auth} = NextAuth({
-  providers: [GitHub],
+  providers: [
+    GitHub,
+    Credentials({
+      async authorize(credentials) {
+        const validatedFields = schemaSignIn.safeParse(credentials);
+
+        if (validatedFields.success) {
+          const {email, password} = validatedFields.data;
+          const {data: account} = await api.accounts.getByProvider(email);
+
+          if (!account) {
+            return null;
+          }
+
+          const {data: user} = await api.users.getById(
+            account.userId.toString(),
+          );
+
+          if (!user) {
+            return null;
+          }
+
+          const isValidPassword = await bcrypt.compare(
+            password,
+            account.password!,
+          );
+
+          if (isValidPassword) {
+            return {
+              id: user._id.toString(),
+              name: user.name,
+              email: user.email,
+              image: user.image,
+            };
+          }
+
+          return null;
+        }
+
+        return null;
+      },
+    }),
+  ],
   callbacks: {
     async session({session, token}) {
       session.user.id = token.sub as string;

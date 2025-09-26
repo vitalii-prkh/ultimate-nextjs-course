@@ -1,10 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import {useRouter} from "next/navigation";
 import {z} from "zod";
 import {useForm, SubmitHandler} from "react-hook-form";
 import {standardSchemaResolver} from "@hookform/resolvers/standard-schema";
+import {toast} from "sonner";
 import {ROUTES} from "@/refs/routes";
+import {signUpWithCredentials} from "@/lib/actions/auth.actions";
 import {schemaSignUp} from "@/lib/validations";
 import {Form, FormField} from "@/components/ui/form";
 import {FormLayout} from "@/components/FormLayout";
@@ -15,6 +18,7 @@ import {FormSubmit} from "@/components/FormSubmit";
 type FormSignInValues = z.infer<typeof schemaSignUp>;
 
 export function FormSignUp() {
+  const router = useRouter();
   const form = useForm<FormSignInValues>({
     resolver: standardSchemaResolver(schemaSignUp),
     defaultValues: {
@@ -24,7 +28,21 @@ export function FormSignUp() {
       password: "",
     },
   });
-  const handleSubmit: SubmitHandler<FormSignInValues> = (values) => {};
+  const handleSubmit: SubmitHandler<FormSignInValues> = async (values) => {
+    const result = await signUpWithCredentials(values);
+
+    if (result.success) {
+      toast.success("Success", {
+        description: "Signed up successfully",
+      });
+
+      router.push(ROUTES.HOME);
+    } else {
+      toast.error(`Error ${result?.status}`, {
+        description: result?.error?.message,
+      });
+    }
+  };
 
   return (
     <Form {...form}>
