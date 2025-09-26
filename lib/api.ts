@@ -1,12 +1,12 @@
 import {fetchHandler as fetch} from "@/lib/handlers/fetch";
 import {TAccountData, TAccountType} from "@/db/account.model";
-import {TUserData, TUserType} from "@/db/user.model";
+import {TUserJSON} from "@/db/user.model";
 
 type PayloadSignInOAuth = Pick<
   TAccountType,
   "provider" | "providerAccountId"
 > & {
-  user: Pick<TUserType, "name" | "username" | "email" | "image">;
+  user: Pick<TUserJSON, "name" | "username" | "email" | "image">;
 };
 
 const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -22,31 +22,31 @@ export const api = {
   },
   users: {
     getAll() {
-      return fetch<TUserData[]>(`${baseUrl}/users`);
+      return fetch<TUserJSON[]>(`${baseUrl}/users`);
     },
     getById(userId: string) {
-      return fetch<TUserData>(`${baseUrl}/users/${userId}`);
+      return fetch<TUserJSON>(`${baseUrl}/users/${userId}`);
     },
     getByEmail(userEmail: string) {
-      return fetch<TUserData>(`${baseUrl}/users/email`, {
+      return fetch<TUserJSON>(`${baseUrl}/users/email`, {
         method: "POST",
         body: JSON.stringify({email: userEmail}),
       });
     },
-    create(userData: TUserType) {
-      return fetch<TUserData>(`${baseUrl}/users`, {
+    create(userData: Partial<TUserJSON>) {
+      return fetch<TUserJSON>(`${baseUrl}/users`, {
         method: "POST",
         body: JSON.stringify(userData),
       });
     },
-    update(userId: string, userData: Partial<TUserType>) {
-      return fetch<TUserData>(`${baseUrl}/users/${userId}`, {
+    update(userId: string, userData: Partial<TUserJSON>) {
+      return fetch<TUserJSON>(`${baseUrl}/users/${userId}`, {
         method: "PUT",
         body: JSON.stringify(userData),
       });
     },
     delete(userId: string) {
-      return fetch<TUserData>(`${baseUrl}/users/${userId}`, {method: "DELETE"});
+      return fetch<TUserJSON>(`${baseUrl}/users/${userId}`, {method: "DELETE"});
     },
   },
   accounts: {

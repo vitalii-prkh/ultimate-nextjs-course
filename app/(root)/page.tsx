@@ -1,74 +1,28 @@
 import Link from "next/link";
 import {ROUTES} from "@/refs/routes";
+import {getQuestions} from "@/lib/actions/question.actions";
 import {Button} from "@/components/ui/button";
 import {LocalSearch} from "@/components/search/LocalSearch";
 import {HomeTags} from "@/components/filters/HomeTags";
 import {CardQuestion} from "@/components/cards/CardQuestion";
 
-const questions = [
-  {
-    _id: "1",
-    title: "How to use the app?",
-    description: "The answer is",
-    tags: [
-      {
-        _id: "1",
-        name: "vue",
-      },
-      {
-        _id: "2",
-        name: "javascript",
-      },
-    ],
-    author: {
-      _id: "1",
-      name: "John Doe",
-      image: "/placeholders/150.jpeg",
-    },
-    upvotes: 10,
-    answers: 5,
-    views: 100,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    _id: "2",
-    title: "How to learn React?",
-    description: "To learn React, you need to know JavaScript.",
-    tags: [
-      {
-        _id: "1",
-        name: "react",
-      },
-      {
-        _id: "2",
-        name: "typescript",
-      },
-    ],
-    author: {
-      _id: "1",
-      name: "John Doe",
-      image: "/placeholders/150.jpeg",
-    },
-    upvotes: 10,
-    answers: 5,
-    views: 100,
-    createdAt: new Date().toISOString(),
-  },
-];
-
 type PageHomeProps = {
-  searchParams: Promise<{query?: string; tag?: string}>;
+  searchParams: Promise<{
+    page?: string;
+    pageSize?: string;
+    query?: string;
+    tag?: string;
+  }>;
 };
 
 async function PageHome(props: PageHomeProps) {
-  const {query = "", tag = ""} = await props.searchParams;
-  const byText = (candidate: string, text: string) =>
-    candidate.toLowerCase().includes(text.toLowerCase());
-  const byTags = <Tag extends {name: string}>(tags: Tag[], text: string) =>
-    tags.some((tag) => byText(tag.name, text));
-  const filteredQuestions = questions.filter(
-    (question) => byText(question.title, query) && byTags(question.tags, tag),
-  );
+  const {page, pageSize, query, tag} = await props.searchParams;
+  const {success, data, error} = await getQuestions({
+    page: Number(page) || 1,
+    pageSize: Number(pageSize) || 10,
+    query: query || "",
+    filter: tag || "",
+  });
 
   return (
     <>
@@ -90,14 +44,28 @@ async function PageHome(props: PageHomeProps) {
         />
       </section>
       <HomeTags />
-      <div className="mt-10 flex w-full flex-col gap-6">
-        {filteredQuestions.map((question) => (
-          <CardQuestion
-            key={question._id}
-            data={question}
-          />
-        ))}
-      </div>
+      {!success && (
+        <div className="mt-10 flex w-full items-center justify-center">
+          <p className="text-dark400_light700">
+            {error?.message || "Failed to fetch questions"}
+          </p>
+        </div>
+      )}
+      {success && (
+        <div className="mt-10 flex w-full flex-col gap-6">
+          {!data.data.length && (
+            <div className="mt-10 flex w-full items-center justify-center">
+              <p className="text-dark400_light700">No questions found</p>
+            </div>
+          )}
+          {data.data.map((question) => (
+            <CardQuestion
+              key={question._id}
+              data={question}
+            />
+          ))}
+        </div>
+      )}
     </>
   );
 }

@@ -1,8 +1,21 @@
-import {InferSchemaType, Require_id, Schema, model, models} from "mongoose";
+import {
+  InferSchemaType,
+  Require_id,
+  Schema,
+  Model,
+  model,
+  models,
+  HydratedDocument,
+  ObjectIdToString,
+} from "mongoose";
 
-export type TUserType = InferSchemaType<typeof schema>;
+export type TUserDoc = InferSchemaType<typeof schema>;
 
-export type TUserData = Require_id<TUserType>;
+export type TUserHydrated = HydratedDocument<TUserDoc>;
+
+export type TUserJSON = ObjectIdToString<Require_id<TUserDoc>>;
+
+export type TUserModel = Model<TUserDoc>;
 
 const schema = new Schema(
   {
@@ -42,6 +55,7 @@ const schema = new Schema(
   },
 );
 
-const User = models?.User || model<TUserType>("User", schema);
+const User =
+  (models?.User as TUserModel) || model<TUserDoc, TUserModel>("User", schema);
 
 export default User;

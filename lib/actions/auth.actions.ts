@@ -3,7 +3,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import Account from "@/db/account.model";
-import User, {TUserType} from "@/db/user.model";
+import User, {TUserJSON} from "@/db/user.model";
 import {action} from "@/lib/handlers/action";
 import {signIn, signOut} from "@/auth";
 import {schemaSignUp, schemaSignIn} from "@/lib/validations";
@@ -11,7 +11,7 @@ import {handleError} from "@/lib/handlers/error";
 import {FailureResponse, SuccessResponse} from "@/types/global";
 import {NotFoundError} from "@/lib/http-errors";
 
-type AuthCredentials = Pick<TUserType, "name" | "username" | "email"> & {
+type AuthCredentials = Pick<TUserJSON, "name" | "username" | "email"> & {
   password: string;
 };
 

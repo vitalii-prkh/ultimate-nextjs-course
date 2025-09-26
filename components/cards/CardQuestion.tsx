@@ -1,12 +1,13 @@
 import Link from "next/link";
 import {ROUTES} from "@/refs/routes";
+import {TQuestionInList} from "@/lib/actions/question.actions";
 import {getTimeStamp} from "@/lib/utils";
 import {buildPath} from "@/lib/path/buildPath";
 import {CardTag} from "@/components/cards/CardTag";
 import {Metric} from "@/components/Metric";
 
 type CardQuestionProps = {
-  data: EntityQuestion;
+  data: TQuestionInList;
 };
 
 export function CardQuestion(props: CardQuestionProps) {
@@ -41,7 +42,7 @@ export function CardQuestion(props: CardQuestionProps) {
           href={buildPath(ROUTES.PROFILE_BY_ID, {profileId: data.author._id})}
         >
           <Metric
-            image={data.author.image}
+            image={data.author.image || "/images/shadcn.jpeg"}
             alt={data.author.name}
             value={data.author.name}
             title={`• asked ${getTimeStamp(new Date(data.createdAt))}`}

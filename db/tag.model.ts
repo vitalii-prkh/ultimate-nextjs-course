@@ -1,8 +1,21 @@
-import {InferSchemaType, Require_id, Schema, model, models} from "mongoose";
+import {
+  InferSchemaType,
+  Require_id,
+  Schema,
+  model,
+  models,
+  HydratedDocument,
+  ObjectIdToString,
+  Model,
+} from "mongoose";
 
-export type TTagType = InferSchemaType<typeof schema>;
+export type TTagDoc = InferSchemaType<typeof schema>;
 
-export type TTagData = Require_id<TTagType>;
+export type TTagHydrated = HydratedDocument<TTagDoc>;
+
+export type TTagJSON = ObjectIdToString<Require_id<TTagDoc>>;
+
+export type TTagModel = Model<TTagDoc>;
 
 const schema = new Schema(
   {
@@ -21,6 +34,7 @@ const schema = new Schema(
   },
 );
 
-const Tag = models?.Tag || model<TTagType>("Tag", schema);
+const Tag =
+  (models?.Tag as TTagModel) || model<TTagDoc, TTagModel>("Tag", schema);
 
 export default Tag;

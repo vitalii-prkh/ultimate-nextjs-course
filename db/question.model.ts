@@ -2,16 +2,20 @@ import {
   InferSchemaType,
   Require_id,
   ObjectIdToString,
+  HydratedDocument,
+  Model,
   Schema,
   model,
   models,
 } from "mongoose";
 
-export type TQuestionType = InferSchemaType<typeof schema>;
+export type TQuestionDoc = InferSchemaType<typeof schema>;
 
-export type TQuestionData = Require_id<TQuestionType>;
+export type TQuestionHydrated = HydratedDocument<TQuestionDoc>;
 
-export type TQuestionJSON = ObjectIdToString<TQuestionData>;
+export type TQuestionJSON = ObjectIdToString<Require_id<TQuestionDoc>>;
+
+export type TQuestionModel = Model<TQuestionDoc>;
 
 const schema = new Schema(
   {
@@ -56,6 +60,8 @@ const schema = new Schema(
   },
 );
 
-const Question = models?.Question || model<TQuestionType>("Question", schema);
+const Question =
+  (models?.Question as TQuestionModel) ||
+  model<TQuestionDoc, TQuestionModel>("Question", schema);
 
 export default Question;
