@@ -15,7 +15,16 @@ type CardTagProps = {
 };
 
 export function CardTag(props: CardTagProps) {
-  const isRemove = typeof props.onRemove === "function";
+  const {onRemove} = props;
+  const isRemove = typeof onRemove === "function";
+  const handleRemove = React.useCallback(
+    (event: React.MouseEvent) => {
+      event.preventDefault();
+
+      onRemove?.();
+    },
+    [onRemove],
+  );
   const content = (
     <React.Fragment>
       <Badge className="subtle-medium background-light800_dark300 text-light400_light500 flex flex-row gap-2 rounded-md border-none px-4 py-2 uppercase">
@@ -30,7 +39,7 @@ export function CardTag(props: CardTagProps) {
             width={12}
             height={12}
             className="cursor-pointer object-contain invert-0 dark:invert"
-            onClick={props.onRemove}
+            onClick={handleRemove}
           />
         )}
       </Badge>

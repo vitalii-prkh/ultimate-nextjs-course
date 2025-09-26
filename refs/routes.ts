@@ -9,6 +9,7 @@ export const ROUTES = {
   ASK_QUESTION: "/ask-question",
   QUESTIONS: "/questions",
   QUESTION_BY_ID: "/questions/[questionId]",
+  QUESTION_UPDATE: "/questions/[questionId]/update",
   SIGN_IN: "/sign-in",
   SIGN_UP: "/sign-up",
 } as const;

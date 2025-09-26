@@ -9,7 +9,7 @@ import {z} from "zod";
 import {standardSchemaResolver} from "@hookform/resolvers/standard-schema";
 import {ROUTES} from "@/refs/routes";
 import {buildPath} from "@/lib/path/buildPath";
-import {createQuestion} from "@/lib/actions/question.actions";
+import {createQuestion, updateQuestion} from "@/lib/actions/question.actions";
 import {schemaAskQuestion} from "@/lib/validations";
 import {Form, FormField} from "@/components/ui/form";
 import {InputText} from "@/components/InputText";
@@ -19,33 +19,65 @@ import {FormSubmit} from "@/components/FormSubmit";
 
 type FormAskQuestionValues = z.infer<typeof schemaAskQuestion>;
 
-export function FormQuestion() {
+type FormQuestionProps = {
+  isUpdate?: boolean;
+  data?: {
+    questionId: string;
+    title: string;
+    content: string;
+    tags: string[];
+  };
+};
+
+export function FormQuestion(props: FormQuestionProps) {
   const router = useRouter();
   const [isPending, startTransition] = React.useTransition();
   const form = useForm<FormAskQuestionValues>({
     defaultValues: {
-      title: "",
-      content: "",
-      tags: [],
+      title: props.data?.title || "",
+      content: props.data?.content || "",
+      tags: props.data?.tags || [],
     },
     resolver: standardSchemaResolver(schemaAskQuestion),
   });
   const handleSubmit: SubmitHandler<FormAskQuestionValues> = async (values) => {
     startTransition(async () => {
-      const result = await createQuestion(values);
-
-      if (result.success) {
-        toast.success("Success", {
-          description: "Question created successfully.",
+      if (props.isUpdate) {
+        const result = await updateQuestion({
+          // @ts-expect-error: We are learning, ignore is ok. On real projects need to keep different forms and reuse the ui.
+          _id: props.data.questionId,
+          ...values,
         });
 
-        router.push(
-          buildPath(ROUTES.QUESTION_BY_ID, {questionId: result.data._id}),
-        );
+        if (result.success) {
+          toast.success("Success", {
+            description: "Question updated successfully.",
+          });
+
+          router.push(
+            buildPath(ROUTES.QUESTION_BY_ID, {questionId: result.data._id}),
+          );
+        } else {
+          toast.error(`Error ${result?.status}`, {
+            description: result?.error?.message,
+          });
+        }
       } else {
-        toast.error(`Error ${result?.status}`, {
-          description: result?.error?.message,
-        });
+        const result = await createQuestion(values);
+
+        if (result.success) {
+          toast.success("Success", {
+            description: "Question created successfully.",
+          });
+
+          router.push(
+            buildPath(ROUTES.QUESTION_BY_ID, {questionId: result.data._id}),
+          );
+        } else {
+          toast.error(`Error ${result?.status}`, {
+            description: result?.error?.message,
+          });
+        }
       }
     });
   };
@@ -110,7 +142,7 @@ export function FormQuestion() {
                 Submitting...
               </React.Fragment>
             )}
-            {!isPending && "Ask A Question"}
+            {!isPending && (props.isUpdate ? "Update" : "Ask A Question")}
           </FormSubmit>
         </div>
       </form>
