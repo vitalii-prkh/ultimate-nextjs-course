@@ -23,9 +23,9 @@ type EntityAuthor = {
   image: string;
 };
 
-type ActionResponse<T = null> = {
+type ActionResponse<T = undefined> = {
   success: boolean;
-  data?: T;
+  data: T;
   error?: {
     message: string;
     details?: Record<string, string[]>;
@@ -33,11 +33,11 @@ type ActionResponse<T = null> = {
   status?: number;
 };
 
-type SuccessResponse<T = null> = ActionResponse<T> & {
+type SuccessResponse<T = undefined> = ActionResponse<T> & {
   success: true;
 };
 
-type FailureResponse<T = null> = ActionResponse<T> & {
+type FailureResponse = ActionResponse & {
   success: false;
 };
 
