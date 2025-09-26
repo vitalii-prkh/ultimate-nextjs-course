@@ -1,9 +1,11 @@
 import Link from "next/link";
 import {ROUTES} from "@/refs/routes";
+import {EMPTY_QUESTION} from "@/refs/states";
 import {getQuestions} from "@/lib/actions/question.actions";
 import {Button} from "@/components/ui/button";
 import {LocalSearch} from "@/components/search/LocalSearch";
 import {HomeTags} from "@/components/filters/HomeTags";
+import {DataRenderer} from "@/components/DataRenderer";
 import {CardQuestion} from "@/components/cards/CardQuestion";
 
 type PageHomeProps = {
@@ -44,28 +46,22 @@ async function PageHome(props: PageHomeProps) {
         />
       </section>
       <HomeTags />
-      {!success && (
-        <div className="mt-10 flex w-full items-center justify-center">
-          <p className="text-dark400_light700">
-            {error?.message || "Failed to fetch questions"}
-          </p>
-        </div>
-      )}
-      {success && (
-        <div className="mt-10 flex w-full flex-col gap-6">
-          {!data.data.length && (
-            <div className="mt-10 flex w-full items-center justify-center">
-              <p className="text-dark400_light700">No questions found</p>
-            </div>
-          )}
-          {data.data.map((question) => (
-            <CardQuestion
-              key={question._id}
-              data={question}
-            />
-          ))}
-        </div>
-      )}
+      <DataRenderer
+        success={success}
+        error={error}
+        data={data?.data}
+        empty={EMPTY_QUESTION}
+        render={(questions) => (
+          <div className="mt-10 flex w-full flex-col gap-6">
+            {questions.map((question) => (
+              <CardQuestion
+                key={question._id}
+                data={question}
+              />
+            ))}
+          </div>
+        )}
+      />
     </>
   );
 }
