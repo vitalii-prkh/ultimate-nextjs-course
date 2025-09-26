@@ -8,7 +8,7 @@ import {action} from "@/lib/handlers/action";
 import {signIn, signOut} from "@/auth";
 import {schemaSignUp, schemaSignIn} from "@/lib/validations";
 import {handleError} from "@/lib/handlers/error";
-import {ActionResponse, FailureResponse} from "@/types/global";
+import {FailureResponse, SuccessResponse} from "@/types/global";
 import {NotFoundError} from "@/lib/http-errors";
 
 type AuthCredentials = Pick<TUserType, "name" | "username" | "email"> & {
@@ -17,14 +17,14 @@ type AuthCredentials = Pick<TUserType, "name" | "username" | "email"> & {
 
 export async function signUpWithCredentials(
   params: AuthCredentials,
-): Promise<ActionResponse> {
+): Promise<SuccessResponse | FailureResponse> {
   const validationResult = await action({
     params,
     schema: schemaSignUp,
   });
 
   if (validationResult instanceof Error) {
-    return handleError(validationResult) as FailureResponse;
+    return handleError(validationResult, "server");
   }
 
   const {name, username, email, password} = validationResult.params!;
@@ -64,11 +64,11 @@ export async function signUpWithCredentials(
     await session.commitTransaction();
     await signIn("credentials", {email, password, redirect: false});
 
-    return {success: true};
+    return {success: true, data: undefined};
   } catch (error) {
     await session.abortTransaction();
 
-    return handleError(error) as FailureResponse;
+    return handleError(error, "server");
   } finally {
     await session.endSession();
   }
@@ -76,14 +76,14 @@ export async function signUpWithCredentials(
 
 export async function signInWithCredentials(
   params: Pick<AuthCredentials, "email" | "password">,
-): Promise<ActionResponse> {
+): Promise<SuccessResponse | FailureResponse> {
   const validationResult = await action({
     params,
     schema: schemaSignIn,
   });
 
   if (validationResult instanceof Error) {
-    return handleError(validationResult) as FailureResponse;
+    return handleError(validationResult, "server");
   }
 
   const {email, password} = validationResult.params!;
@@ -115,9 +115,9 @@ export async function signInWithCredentials(
 
     await signIn("credentials", {email, password, redirect: false});
 
-    return {success: true};
+    return {success: true, data: undefined};
   } catch (error) {
-    return handleError(error) as FailureResponse;
+    return handleError(error, "server");
   }
 }
 
