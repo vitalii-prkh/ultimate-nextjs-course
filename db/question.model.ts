@@ -1,8 +1,17 @@
-import {InferSchemaType, Require_id, Schema, model, models} from "mongoose";
+import {
+  InferSchemaType,
+  Require_id,
+  ObjectIdToString,
+  Schema,
+  model,
+  models,
+} from "mongoose";
 
 export type TQuestionType = InferSchemaType<typeof schema>;
 
 export type TQuestionData = Require_id<TQuestionType>;
+
+export type TQuestionJSON = ObjectIdToString<TQuestionData>;
 
 const schema = new Schema(
   {
