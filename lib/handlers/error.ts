@@ -2,13 +2,25 @@ import {NextResponse} from "next/server";
 import {z, ZodError} from "zod";
 import {RequestError, ValidationError} from "@/lib/http-errors";
 import {log} from "@/lib/log";
+import {FailureResponse} from "@/types/global";
 
-export type ResponseType = "api" | "server";
+type ResponseType = "api" | "server";
+
+type ErrorBody = Pick<FailureResponse, "status" | "success" | "error" | "data">;
+
+type ServerErrorResponse = {status: number} & ErrorBody;
+
+type ApiErrorResponse = NextResponse<ErrorBody>;
 
 export function handleError(
   error: unknown,
-  responseType: ResponseType = "server",
-) {
+  responseType: "api",
+): ApiErrorResponse;
+export function handleError(
+  error: unknown,
+  responseType: "server",
+): ServerErrorResponse;
+export function handleError(error: unknown, responseType: ResponseType) {
   if (error instanceof RequestError) {
     log.error(
       {err: error},
@@ -54,8 +66,9 @@ function formatResponse(
   message: string,
   errors?: Record<string, string[]>,
 ) {
-  const responseContent = {
+  const responseContent: ErrorBody = {
     success: false,
+    data: undefined,
     error: {
       message,
       details: errors,

@@ -1,4 +1,4 @@
-import {ActionResponse} from "@/types/global";
+import {ActionResponse, FailureResponse, SuccessResponse} from "@/types/global";
 import {log} from "@/lib/log";
 import {handleError} from "@/lib/handlers/error";
 import {RequestError} from "@/lib/http-errors";
@@ -10,7 +10,7 @@ interface FetchOptions extends RequestInit {
 export async function fetchHandler<T>(
   url: string,
   options: FetchOptions = {},
-): Promise<ActionResponse<T>> {
+): Promise<SuccessResponse<T> | FailureResponse> {
   const {timeout = 5000, headers: customHeaders = {}, ...restOptions} = options;
 
   const controller = new AbortController();
@@ -49,7 +49,7 @@ export async function fetchHandler<T>(
       log.error(`Error fetching "${url}": ${error.message}`);
     }
 
-    return handleError(error) as ActionResponse<T>;
+    return handleError(error, "server");
   }
 }
 
