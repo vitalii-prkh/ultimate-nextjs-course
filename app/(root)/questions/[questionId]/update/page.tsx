@@ -31,7 +31,7 @@ async function PageQuestionUpdate(props: PageQuestionUpdateProps) {
     return notFound();
   }
 
-  if (data.author.toString() !== session?.user?.id) {
+  if (data.author._id !== session?.user?.id) {
     return redirect(buildPath(ROUTES.QUESTION_BY_ID, {questionId}));
   }
 

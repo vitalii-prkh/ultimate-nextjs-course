@@ -212,7 +212,7 @@ type TGetQuestionParams = {
 
 type TGetQuestionData = Omit<TQuestionJSON, "tags" | "author"> & {
   tags: TTagJSON[];
-  author: TUserJSON;
+  author: Pick<TUserJSON, "_id" | "name" | "image">;
 };
 
 export async function getQuestion(
@@ -233,7 +233,7 @@ export async function getQuestion(
   try {
     const question = await Question.findById(questionId)
       .populate("tags")
-      .populate("author");
+      .populate("author", "name image");
 
     if (!question) {
       throw new Error("Question not found");

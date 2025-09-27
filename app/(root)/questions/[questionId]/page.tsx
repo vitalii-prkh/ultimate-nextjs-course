@@ -1,4 +1,5 @@
 import React from "react";
+import {redirect} from "next/navigation";
 import Link from "next/link";
 import {ROUTES} from "@/refs/routes";
 import {getQuestion} from "@/lib/actions/question.actions";
@@ -7,6 +8,7 @@ import {formatNumber, getTimeStamp} from "@/lib/utils";
 import {UserAvatar} from "@/components/UserAvatar";
 import {Metric} from "@/components/Metric";
 import {CardTagView} from "@/components/cards/CardTagView";
+import {Preview} from "@/components/editor/Preview";
 
 type PageQuestionProps = {
   params: Promise<{questionId: string}>;
@@ -16,8 +18,8 @@ async function PageQuestionById(props: PageQuestionProps) {
   const {questionId} = await props.params;
   const {success, data} = await getQuestion({questionId});
 
-  if (!success) {
-    return null;
+  if (!success || !data) {
+    return redirect("/404");
   }
 
   const {author} = data;
@@ -70,7 +72,7 @@ async function PageQuestionById(props: PageQuestionProps) {
           title={formatNumber(data.views)}
         />
       </div>
-      <p>Preview content</p>
+      <Preview content={data.content} />
       <div className="mt-8 flex flex-wrap gap-2">
         {data?.tags.map((tag) => (
           <CardTagView
