@@ -90,7 +90,7 @@ async function PageQuestionById(props: PageQuestionProps) {
         ))}
       </div>
       <section className="my-5">
-        <FormAnswer />
+        <FormAnswer questionId={questionId} />
       </section>
     </React.Fragment>
   );

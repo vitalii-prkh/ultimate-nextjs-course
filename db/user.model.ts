@@ -1,12 +1,12 @@
 import {
   InferSchemaType,
-  Require_id,
-  Schema,
-  Model,
-  model,
-  models,
   HydratedDocument,
   ObjectIdToString,
+  Require_id,
+  Schema,
+  model,
+  models,
+  Model,
 } from "mongoose";
 
 export type TUserDoc = InferSchemaType<typeof schema>;

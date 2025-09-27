@@ -1,12 +1,12 @@
 import {
   InferSchemaType,
-  Require_id,
-  ObjectIdToString,
   HydratedDocument,
-  Model,
+  ObjectIdToString,
+  Require_id,
   Schema,
   model,
   models,
+  Model,
 } from "mongoose";
 
 export type TQuestionDoc = InferSchemaType<typeof schema>;

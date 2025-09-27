@@ -1,8 +1,21 @@
-import {InferSchemaType, Require_id, Schema, model, models} from "mongoose";
+import {
+  InferSchemaType,
+  HydratedDocument,
+  ObjectIdToString,
+  Require_id,
+  Schema,
+  model,
+  models,
+  Model,
+} from "mongoose";
 
-export type TAnswerType = InferSchemaType<typeof schema>;
+export type TAnswerDoc = InferSchemaType<typeof schema>;
 
-export type TAnswerData = Require_id<TAnswerType>;
+export type TAnswerHydrated = HydratedDocument<TAnswerDoc>;
+
+export type TAnswerJSON = ObjectIdToString<Require_id<TAnswerDoc>>;
+
+export type TAnswerModel = Model<TAnswerDoc>;
 
 const schema = new Schema(
   {
@@ -34,6 +47,8 @@ const schema = new Schema(
   },
 );
 
-const Answer = models?.Answer || model<TAnswerType>("Answer", schema);
+const Answer =
+  (models?.Answer as TAnswerModel) ||
+  model<TAnswerDoc, TAnswerModel>("Answer", schema);
 
 export default Answer;

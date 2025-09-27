@@ -3,10 +3,11 @@
 import React from "react";
 import Image from "next/image";
 import {useForm, SubmitHandler} from "react-hook-form";
-import {Loader} from "lucide-react";
+import {toast} from "sonner";
 import {ReloadIcon} from "@radix-ui/react-icons";
 import {z} from "zod";
 import {standardSchemaResolver} from "@hookform/resolvers/standard-schema";
+import {createAnswer} from "@/lib/actions/answer.actions";
 import {schemaAnswer} from "@/lib/validations";
 import {Button} from "@/components/ui/button";
 import {Form, FormField} from "@/components/ui/form";
@@ -15,15 +16,35 @@ import {FormSubmit} from "@/components/FormSubmit";
 
 type FormAnswerValues = z.infer<typeof schemaAnswer>;
 
-export function FormAnswer() {
+type FormAnswerProps = {
+  questionId: string;
+};
+
+export function FormAnswer(props: FormAnswerProps) {
+  const {questionId} = props;
   const [isAISubmitting, setAISubmitting] = React.useState(false);
+  const [isAnswering, setAnsweringTransition] = React.useTransition();
   const form = useForm<FormAnswerValues>({
     defaultValues: {
       content: "",
     },
     resolver: standardSchemaResolver(schemaAnswer),
   });
-  const handleSubmit: SubmitHandler<FormAnswerValues> = async (values) => {};
+  const handleSubmit: SubmitHandler<FormAnswerValues> = async (values) => {
+    setAnsweringTransition(async () => {
+      const result = await createAnswer({...values, questionId});
+
+      if (result.success) {
+        toast.success("Success", {
+          description: "Answer created successfully.",
+        });
+      } else {
+        toast.error("Error", {
+          description: result?.error?.message,
+        });
+      }
+    });
+  };
 
   return (
     <Form {...form}>
@@ -74,14 +95,14 @@ export function FormAnswer() {
           )}
         />
         <div className="flex justify-end">
-          <FormSubmit disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting && (
+          <FormSubmit disabled={isAnswering}>
+            {isAnswering && (
               <React.Fragment>
-                <Loader className="mr-2 size-4 animate-spin" />
-                Submitting...
+                <ReloadIcon className="mr-2 size-4 animate-spin" />
+                Posting...
               </React.Fragment>
             )}
-            {!form.formState.isSubmitting && "Submit"}
+            {!isAnswering && "Post Answer"}
           </FormSubmit>
         </div>
       </form>
