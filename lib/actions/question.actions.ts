@@ -1,21 +1,26 @@
 "use server";
 
 import mongoose, {FilterQuery, Types} from "mongoose";
+import {revalidatePath} from "next/cache";
 import {z} from "zod";
 import Question, {TQuestionHydrated, TQuestionJSON} from "@/db/question.model";
 import Tag, {TTagHydrated, TTagJSON} from "@/db/tag.model";
 import TagQuestion, {TTagQuestionData} from "@/db/tag-question.model";
 import {TUserJSON} from "@/db/user.model";
+import {ROUTES} from "@/refs/routes";
 import {FILTERS} from "@/refs/filters";
+import {buildPath} from "@/lib/path/buildPath";
 import {action} from "@/lib/handlers/action";
 import {
   schemaAskQuestion,
   schemaUpdateQuestion,
   schemaGetQuestion,
   schemaSearchParams,
+  schemaIncrementViews,
 } from "@/lib/validations";
 import {handleError} from "@/lib/handlers/error";
 import {FailureResponse, SuccessResponse} from "@/types/global";
+import {NotFoundError} from "@/lib/http-errors";
 
 type TPostQuestionParams = Pick<TQuestionJSON, "title" | "content" | "tags">;
 
@@ -327,6 +332,48 @@ export async function getQuestions(
       data: {
         data: JSON.parse(JSON.stringify(questions)),
         isNext: totalQuestions > skip + questions.length,
+      },
+    };
+  } catch (error) {
+    return handleError(error, "server");
+  }
+}
+
+type TIncrementViewsParams = z.infer<typeof schemaIncrementViews>;
+
+type TIncrementViewsData = Pick<TQuestionJSON, "views">;
+
+export async function incrementViews(
+  params: TIncrementViewsParams,
+): Promise<SuccessResponse<TIncrementViewsData> | FailureResponse> {
+  const validationResult = await action({
+    params,
+    schema: schemaIncrementViews,
+  });
+
+  if (validationResult instanceof Error) {
+    return handleError(validationResult, "server");
+  }
+
+  const {questionId} = validationResult.params!;
+
+  try {
+    const question = await Question.findById(questionId);
+
+    if (!question) {
+      throw new NotFoundError("Question");
+    }
+
+    question.views += 1;
+
+    await question.save();
+
+    revalidatePath(buildPath(ROUTES.QUESTION_BY_ID, {questionId}));
+
+    return {
+      success: true,
+      data: {
+        views: question.views,
       },
     };
   } catch (error) {

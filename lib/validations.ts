@@ -125,3 +125,7 @@ export const schemaSearchParams = z.object({
 export const schemaSearchTagQuestionsParams = schemaSearchParams.extend({
   tagId: z.string().min(1, {message: "Tag ID is required"}),
 });
+
+export const schemaIncrementViews = z.object({
+  questionId: z.string().min(1, "Question ID is required"),
+});

@@ -9,6 +9,7 @@ import {UserAvatar} from "@/components/UserAvatar";
 import {Metric} from "@/components/Metric";
 import {CardTagView} from "@/components/cards/CardTagView";
 import {Preview} from "@/components/editor/Preview";
+import {HandleView} from "@/components/HandleView";
 
 type PageQuestionProps = {
   params: Promise<{questionId: string}>;
@@ -26,6 +27,7 @@ async function PageQuestionById(props: PageQuestionProps) {
 
   return (
     <React.Fragment>
+      <HandleView questionId={questionId} />
       <div className="flex-start w-full flex-col">
         <div className="flex w-full flex-col-reverse">
           <div className="flex items-center justify-start gap-1">
