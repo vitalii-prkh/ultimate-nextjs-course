@@ -1,15 +1,12 @@
 "use server";
 
 import mongoose, {FilterQuery, Types} from "mongoose";
-import {revalidatePath} from "next/cache";
 import {z} from "zod";
 import Question, {TQuestionHydrated, TQuestionJSON} from "@/db/question.model";
 import Tag, {TTagHydrated, TTagJSON} from "@/db/tag.model";
 import TagQuestion, {TTagQuestionData} from "@/db/tag-question.model";
 import {TUserJSON} from "@/db/user.model";
-import {ROUTES} from "@/refs/routes";
 import {FILTERS} from "@/refs/filters";
-import {buildPath} from "@/lib/path/buildPath";
 import {action} from "@/lib/handlers/action";
 import {
   schemaAskQuestion,
@@ -367,8 +364,6 @@ export async function incrementViews(
     question.views += 1;
 
     await question.save();
-
-    revalidatePath(buildPath(ROUTES.QUESTION_BY_ID, {questionId}));
 
     return {
       success: true,

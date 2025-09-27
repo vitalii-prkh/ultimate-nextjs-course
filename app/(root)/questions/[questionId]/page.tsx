@@ -2,14 +2,13 @@ import React from "react";
 import {redirect} from "next/navigation";
 import Link from "next/link";
 import {ROUTES} from "@/refs/routes";
-import {getQuestion} from "@/lib/actions/question.actions";
+import {getQuestion, incrementViews} from "@/lib/actions/question.actions";
 import {buildPath} from "@/lib/path/buildPath";
 import {formatNumber, getTimeStamp} from "@/lib/utils";
 import {UserAvatar} from "@/components/UserAvatar";
 import {Metric} from "@/components/Metric";
 import {CardTagView} from "@/components/cards/CardTagView";
 import {Preview} from "@/components/editor/Preview";
-import {HandleView} from "@/components/HandleView";
 
 type PageQuestionProps = {
   params: Promise<{questionId: string}>;
@@ -17,7 +16,10 @@ type PageQuestionProps = {
 
 async function PageQuestionById(props: PageQuestionProps) {
   const {questionId} = await props.params;
-  const {success, data} = await getQuestion({questionId});
+  const [{success, data}] = await Promise.all([
+    getQuestion({questionId}),
+    incrementViews({questionId}),
+  ]);
 
   if (!success || !data) {
     return redirect("/404");
@@ -27,7 +29,6 @@ async function PageQuestionById(props: PageQuestionProps) {
 
   return (
     <React.Fragment>
-      <HandleView questionId={questionId} />
       <div className="flex-start w-full flex-col">
         <div className="flex w-full flex-col-reverse">
           <div className="flex items-center justify-start gap-1">
