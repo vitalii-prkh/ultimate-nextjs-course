@@ -26,8 +26,6 @@ async function PageTags(props: PageTagsProps) {
     filter: tag || "",
   });
 
-  console.log(success, data, error);
-
   return (
     <React.Fragment>
       <h1 className="h1-bold text-dark100_light900 text-3xl">Tags</h1>
