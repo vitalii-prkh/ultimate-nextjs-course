@@ -81,10 +81,11 @@ type TGetAnswersParams = z.infer<typeof schemaGetAnswers>;
 
 type TGetAnswersData = {
   data: TAnswerInList[];
+  total: number;
   isNext: boolean;
 };
 
-type TAnswerInList = Omit<TAnswerJSON, "author"> & {
+export type TAnswerInList = Omit<TAnswerJSON, "author"> & {
   author: Pick<TUserJSON, "_id" | "name" | "image">;
 };
 
@@ -140,6 +141,7 @@ export async function getAnswers(
       success: true,
       data: {
         data: JSON.parse(JSON.stringify(answers)),
+        total: totalAnswers,
         isNext: totalAnswers > skip + answers.length,
       },
     };

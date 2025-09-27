@@ -31,7 +31,7 @@ export async function Navbar() {
           <UserAvatar
             profileId={session.user.id}
             name={session.user.name!}
-            image={session.user.image!}
+            image={session.user.image || "/images/shadcn.jpeg"}
           />
         )}
         <MobileNav />

@@ -13,6 +13,7 @@ import {Metric} from "@/components/Metric";
 import {CardTagView} from "@/components/cards/CardTagView";
 import {Preview} from "@/components/editor/Preview";
 import {FormAnswer} from "@/components/forms/FormAnswer";
+import {AllAnswers} from "@/components/answers/AllAnswers";
 
 type PageQuestionProps = {
   params: Promise<{questionId: string}>;
@@ -30,14 +31,12 @@ async function PageQuestionById(props: PageQuestionProps) {
     return redirect("/404");
   }
 
-  const {data: answers} = await getAnswers({
+  const answers = await getAnswers({
     questionId,
     page: 1,
     pageSize: 10,
     filter: FILTERS.NEWEST,
   });
-
-  console.log(answers);
 
   const {author} = data;
 
@@ -100,6 +99,14 @@ async function PageQuestionById(props: PageQuestionProps) {
           />
         ))}
       </div>
+      <section className="my-5">
+        <AllAnswers
+          data={answers?.data?.data}
+          success={answers?.success}
+          error={answers?.error}
+          total={answers?.data?.total || 0}
+        />
+      </section>
       <section className="my-5">
         <FormAnswer questionId={questionId} />
       </section>
