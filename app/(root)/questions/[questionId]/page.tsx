@@ -3,7 +3,9 @@ import {after} from "next/server";
 import {redirect} from "next/navigation";
 import Link from "next/link";
 import {ROUTES} from "@/refs/routes";
+import {FILTERS} from "@/refs/filters";
 import {getQuestion, incrementViews} from "@/lib/actions/question.actions";
+import {getAnswers} from "@/lib/actions/answer.actions";
 import {buildPath} from "@/lib/path/buildPath";
 import {formatNumber, getTimeStamp} from "@/lib/utils";
 import {UserAvatar} from "@/components/UserAvatar";
@@ -27,6 +29,15 @@ async function PageQuestionById(props: PageQuestionProps) {
   if (!success || !data) {
     return redirect("/404");
   }
+
+  const {data: answers} = await getAnswers({
+    questionId,
+    page: 1,
+    pageSize: 10,
+    filter: FILTERS.NEWEST,
+  });
+
+  console.log(answers);
 
   const {author} = data;
 

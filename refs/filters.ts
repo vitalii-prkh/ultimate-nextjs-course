@@ -6,7 +6,6 @@ export const FILTERS = {
   NAME: "name",
   RECENT: "recent",
   OLDEST: "oldest",
-  LATEST: "latest",
   MOST_VOTED: "mostvoted",
   MOST_VIEWED: "mostviewed",
   MOST_RECENT: "mostrecent",
@@ -32,7 +31,7 @@ export const TAG_FILTERS = [
 ] as const;
 
 export const ANSWER_FILTERS = [
-  {label: "Newest", value: FILTERS.LATEST},
+  {label: "Newest", value: FILTERS.NEWEST},
   {label: "Oldest", value: FILTERS.OLDEST},
   {label: "Popular", value: FILTERS.POPULAR},
 ] as const;

@@ -137,3 +137,7 @@ export const schemaAnswer = z.object({
 export const schemaAnswerAction = schemaAnswer.extend({
   questionId: z.string().min(1, "Question ID is required"),
 });
+
+export const schemaGetAnswers = schemaSearchParams.extend({
+  questionId: z.string().min(1, "Question ID is required"),
+});
