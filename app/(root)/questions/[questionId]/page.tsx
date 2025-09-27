@@ -10,6 +10,7 @@ import {UserAvatar} from "@/components/UserAvatar";
 import {Metric} from "@/components/Metric";
 import {CardTagView} from "@/components/cards/CardTagView";
 import {Preview} from "@/components/editor/Preview";
+import {FormAnswer} from "@/components/forms/FormAnswer";
 
 type PageQuestionProps = {
   params: Promise<{questionId: string}>;
@@ -88,6 +89,9 @@ async function PageQuestionById(props: PageQuestionProps) {
           />
         ))}
       </div>
+      <section className="my-5">
+        <FormAnswer />
+      </section>
     </React.Fragment>
   );
 }
