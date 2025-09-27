@@ -1,4 +1,5 @@
 import React from "react";
+import {after} from "next/server";
 import {redirect} from "next/navigation";
 import Link from "next/link";
 import {ROUTES} from "@/refs/routes";
@@ -16,10 +17,11 @@ type PageQuestionProps = {
 
 async function PageQuestionById(props: PageQuestionProps) {
   const {questionId} = await props.params;
-  const [{success, data}] = await Promise.all([
-    getQuestion({questionId}),
-    incrementViews({questionId}),
-  ]);
+  const {success, data} = await getQuestion({questionId});
+
+  after(async () => {
+    await incrementViews({questionId});
+  });
 
   if (!success || !data) {
     return redirect("/404");
