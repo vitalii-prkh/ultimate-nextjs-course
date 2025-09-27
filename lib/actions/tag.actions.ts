@@ -89,11 +89,12 @@ type TGetTagQuestionsParams = Omit<
 >;
 
 type TGetTagQuestionsData = {
-  data: TQuestionInList[];
+  tag: TTagJSON;
+  data: TTagQuestionInList[];
   isNext: boolean;
 };
 
-export type TQuestionInList = Omit<
+export type TTagQuestionInList = Omit<
   Pick<
     TQuestionJSON,
     | "_id"
@@ -154,6 +155,7 @@ export async function getTagQuestions(
     return {
       success: true,
       data: {
+        tag: JSON.parse(JSON.stringify(tag)),
         data: JSON.parse(JSON.stringify(questions)),
         isNext: totalQuestions > skip + questions.length,
       },

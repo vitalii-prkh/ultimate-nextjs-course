@@ -1,13 +1,14 @@
 import Link from "next/link";
 import {ROUTES} from "@/refs/routes";
 import {TQuestionInList} from "@/lib/actions/question.actions";
+import {TTagQuestionInList} from "@/lib/actions/tag.actions";
 import {getTimeStamp} from "@/lib/utils";
 import {buildPath} from "@/lib/path/buildPath";
 import {CardTag} from "@/components/cards/CardTag";
 import {Metric} from "@/components/Metric";
 
 type CardQuestionProps = {
-  data: TQuestionInList;
+  data: TQuestionInList | TTagQuestionInList;
 };
 
 export function CardQuestion(props: CardQuestionProps) {
