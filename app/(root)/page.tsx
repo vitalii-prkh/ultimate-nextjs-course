@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {ROUTES} from "@/refs/routes";
 import {EMPTY_QUESTION} from "@/refs/states";
+import {HOME_FILTERS} from "@/refs/filters";
 import {getQuestions} from "@/lib/actions/question.actions";
 import {Button} from "@/components/ui/button";
 import {LocalSearch} from "@/components/search/LocalSearch";
@@ -45,7 +46,7 @@ async function PageHome(props: PageHomeProps) {
           className="flex-1"
         />
       </section>
-      <HomeTags />
+      <HomeTags options={HOME_FILTERS} />
       <DataRenderer
         success={success}
         error={error}

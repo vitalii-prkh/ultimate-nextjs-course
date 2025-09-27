@@ -2,12 +2,18 @@
 
 import React from "react";
 import {useRouter, useSearchParams} from "next/navigation";
-import {HOME_FILTERS} from "@/refs/filters";
 import {remUrlQuery, setUrlQuery} from "@/lib/url";
 import {cn} from "@/lib/utils";
 import {Button} from "@/components/ui/button";
 
-export function HomeTags() {
+type HomeTagsProps = {
+  options: ReadonlyArray<{
+    label: string;
+    value: string;
+  }>;
+};
+
+export function HomeTags(props: HomeTagsProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tag = searchParams.get("tag") || "";
@@ -34,7 +40,7 @@ export function HomeTags() {
 
   return (
     <div className="mt-10 hidden flex-wrap gap-3 sm:flex">
-      {HOME_FILTERS.map((option) => (
+      {props?.options?.map((option) => (
         <Button
           key={option.value}
           type="button"
