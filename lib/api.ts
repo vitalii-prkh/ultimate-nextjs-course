@@ -85,6 +85,7 @@ export const api = {
       return fetch<string>(`${baseUrl}/ai/answers`, {
         method: "POST",
         body: JSON.stringify({question, content}),
+        timeout: 100000,
       });
     },
   },

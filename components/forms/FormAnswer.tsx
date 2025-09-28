@@ -1,12 +1,14 @@
 "use client";
 
 import React from "react";
+import {useSession} from "next-auth/react";
 import Image from "next/image";
 import {useForm, SubmitHandler} from "react-hook-form";
 import {toast} from "sonner";
 import {ReloadIcon} from "@radix-ui/react-icons";
 import {z} from "zod";
 import {standardSchemaResolver} from "@hookform/resolvers/standard-schema";
+import {api} from "@/lib/api";
 import {createAnswer} from "@/lib/actions/answer.actions";
 import {schemaAnswer} from "@/lib/validations";
 import {Button} from "@/components/ui/button";
@@ -18,10 +20,13 @@ type FormAnswerValues = z.infer<typeof schemaAnswer>;
 
 type FormAnswerProps = {
   questionId: string;
+  title: string;
+  content: string;
 };
 
 export function FormAnswer(props: FormAnswerProps) {
   const {questionId} = props;
+  const session = useSession();
   const [isAISubmitting, setAISubmitting] = React.useState(false);
   const [isAnswering, setAnsweringTransition] = React.useTransition();
   const form = useForm<FormAnswerValues>({
@@ -38,12 +43,54 @@ export function FormAnswer(props: FormAnswerProps) {
         toast.success("Success", {
           description: "Answer created successfully.",
         });
+
+        form.reset();
       } else {
         toast.error("Error", {
           description: result?.error?.message,
         });
       }
     });
+  };
+  const generateAIAnswer = async () => {
+    if (session.status === "authenticated") {
+      setAISubmitting(true);
+
+      try {
+        const {success, data, error} = await api.ai.getAnswer(
+          props.title,
+          props.content,
+        );
+
+        if (!success) {
+          toast.error("Error", {
+            description: error?.message,
+          });
+        } else {
+          const formattedAnswer = data?.replace(/<br>/g, " ").toString().trim();
+
+          form.setValue("content", formattedAnswer);
+          form.trigger("content");
+
+          toast.success("Success", {
+            description: "AI answer generated successfully.",
+          });
+        }
+      } catch (error) {
+        toast.error("Error", {
+          description:
+            error instanceof Error
+              ? error.message
+              : "Failed to generate AI answer.",
+        });
+      } finally {
+        setAISubmitting(false);
+      }
+    } else {
+      toast.error("Error", {
+        description: "You must be logged in to generate an AI answer.",
+      });
+    }
   };
 
   return (
@@ -60,6 +107,7 @@ export function FormAnswer(props: FormAnswerProps) {
             disabled={isAISubmitting}
             type="button"
             className="btn light-border-2 text-primart-500 dark:text-primary-500 gap-1.5 rounded-md border px-4 py-2.5 shadow-none"
+            onClick={generateAIAnswer}
           >
             {isAISubmitting && (
               <React.Fragment>
