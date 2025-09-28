@@ -14,6 +14,7 @@ import {CardTagView} from "@/components/cards/CardTagView";
 import {Preview} from "@/components/editor/Preview";
 import {FormAnswer} from "@/components/forms/FormAnswer";
 import {AllAnswers} from "@/components/answers/AllAnswers";
+import {Votes} from "@/components/votes/Votes";
 
 type PageQuestionProps = {
   params: Promise<{questionId: string}>;
@@ -61,7 +62,12 @@ async function PageQuestionById(props: PageQuestionProps) {
             </Link>
           </div>
           <div className="flex justify-end">
-            <p>Votes</p>
+            <Votes
+              upvotes={data.upvotes}
+              downvotes={data.downvotes}
+              hasUpvoted={true}
+              hasDownvoted={false}
+            />
           </div>
         </div>
         <h2 className="h2-semibold text-dark200_light900 mt-3 w-full">
