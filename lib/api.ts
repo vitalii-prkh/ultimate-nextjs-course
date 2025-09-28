@@ -80,4 +80,12 @@ export const api = {
       });
     },
   },
+  ai: {
+    getAnswer(question: string, content: string) {
+      return fetch<string>(`${baseUrl}/ai/answers`, {
+        method: "POST",
+        body: JSON.stringify({question, content}),
+      });
+    },
+  },
 };
