@@ -81,10 +81,10 @@ export const api = {
     },
   },
   ai: {
-    getAnswer(question: string, content: string) {
+    getAnswer(question: string, content: string, userAnswer?: string) {
       return fetch<string>(`${baseUrl}/ai/answers`, {
         method: "POST",
-        body: JSON.stringify({question, content}),
+        body: JSON.stringify({question, content, userAnswer}),
         timeout: 100000,
       });
     },

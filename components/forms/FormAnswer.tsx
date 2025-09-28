@@ -60,6 +60,7 @@ export function FormAnswer(props: FormAnswerProps) {
         const {success, data, error} = await api.ai.getAnswer(
           props.title,
           props.content,
+          form.getValues("content"),
         );
 
         if (!success) {
