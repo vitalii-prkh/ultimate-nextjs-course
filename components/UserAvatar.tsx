@@ -29,8 +29,7 @@ export function UserAvatar(props: UserAvatarProps) {
           <Image
             src={props.image}
             alt={props.name}
-            width={36}
-            height={36}
+            fill
             className="object-cover"
             quality={100}
           />

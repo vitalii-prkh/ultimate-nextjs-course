@@ -26,6 +26,7 @@ type EntityAuthor = {
 type SuccessResponse<T = undefined> = {
   success: true;
   data: T;
+  error?: undefined;
   status?: number;
 };
 
