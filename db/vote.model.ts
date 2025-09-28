@@ -1,8 +1,21 @@
-import {InferSchemaType, Require_id, Schema, model, models} from "mongoose";
+import {
+  InferSchemaType,
+  HydratedDocument,
+  ObjectIdToString,
+  Require_id,
+  Schema,
+  model,
+  models,
+  Model,
+} from "mongoose";
 
-export type TVoteType = InferSchemaType<typeof schema>;
+export type TVoteDoc = InferSchemaType<typeof schema>;
 
-export type TVoteData = Require_id<TVoteType>;
+export type TVoteHydrated = HydratedDocument<TVoteDoc>;
+
+export type TVoteJSON = ObjectIdToString<Require_id<TVoteDoc>>;
+
+export type TVoteModel = Model<TVoteDoc>;
 
 const schema = new Schema(
   {
@@ -31,6 +44,7 @@ const schema = new Schema(
   },
 );
 
-const Vote = models?.Vote || model<TVoteType>("Vote", schema);
+const Vote =
+  (models?.Vote as TVoteModel) || model<TVoteDoc, TVoteModel>("Vote", schema);
 
 export default Vote;

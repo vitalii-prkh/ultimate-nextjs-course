@@ -5,21 +5,24 @@ import {useSession} from "next-auth/react";
 import Image from "next/image";
 import {toast} from "sonner";
 import {cn, formatNumber} from "@/lib/utils";
+import {createVote, hasVoted} from "@/lib/actions/vote.actions";
 
 type VotesProps = {
   upvotes: number;
   downvotes: number;
-  hasUpvoted: boolean;
-  hasDownvoted: boolean;
+  targetType: "question" | "answer";
+  targetId: string;
+  hasVotedPromise: Promise<Awaited<ReturnType<typeof hasVoted>>>;
 };
 
 export function Votes(props: VotesProps) {
   const session = useSession();
   const userId = session.data?.user?.id;
   const [isPending, setPending] = React.useState(false);
-  const handleClick = (
+  const {success, data} = React.use(props.hasVotedPromise);
+  const handleClick = async (
     event: React.MouseEvent,
-    type: "upvote" | "downvote",
+    voteType: "upvote" | "downvote",
   ) => {
     event.preventDefault();
 
@@ -38,18 +41,30 @@ export function Votes(props: VotesProps) {
     setPending(true);
 
     try {
-      const successMessage =
-        type === "upvote"
-          ? props.hasUpvoted
-            ? "Upvote removed successfully"
-            : "Upvote added successfully"
-          : props.hasDownvoted
-            ? "Downvote removed successfully"
-            : "Downvote added successfully";
-
-      toast.success(successMessage, {
-        description: "Your vote has been recorded.",
+      const result = await createVote({
+        targetType: props.targetType,
+        targetId: props.targetId,
+        voteType,
       });
+
+      if (result.success) {
+        const successMessage =
+          voteType === "upvote"
+            ? data?.hasUpvoted
+              ? "Upvote removed successfully"
+              : "Upvote added successfully"
+            : data?.hasDownvoted
+              ? "Downvote removed successfully"
+              : "Downvote added successfully";
+
+        toast.success(successMessage, {
+          description: "Your vote has been recorded.",
+        });
+      } else {
+        toast.error("Error", {
+          description: "Failed to vote",
+        });
+      }
     } catch (error) {
       toast.error("Failed to vote", {
         description:
@@ -72,7 +87,11 @@ export function Votes(props: VotesProps) {
     <div className="flex-center gap-2.5">
       <div className="flex-center gap-1.5">
         <Image
-          src={props.hasUpvoted ? "/icons/upvoted.svg" : "/icons/upvote.svg"}
+          src={
+            success && data?.hasUpvoted
+              ? "/icons/upvoted.svg"
+              : "/icons/upvote.svg"
+          }
           alt="upvote"
           width={18}
           height={18}
@@ -91,7 +110,9 @@ export function Votes(props: VotesProps) {
       <div className="flex-center gap-1.5">
         <Image
           src={
-            props.hasDownvoted ? "/icons/downvoted.svg" : "/icons/downvote.svg"
+            success && data?.hasDownvoted
+              ? "/icons/downvoted.svg"
+              : "/icons/downvote.svg"
           }
           alt="downvote"
           width={18}

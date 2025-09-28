@@ -23,22 +23,20 @@ type EntityAuthor = {
   image: string;
 };
 
-type ActionResponse<T = undefined> = {
-  success: boolean;
+type SuccessResponse<T = undefined> = {
+  success: true;
   data: T;
+  status?: number;
+};
+
+type FailureResponse<T = undefined> = {
+  success: false;
+  data?: T;
   error?: {
     message: string;
     details?: Record<string, string[]>;
   };
   status?: number;
-};
-
-type SuccessResponse<T = undefined> = ActionResponse<T> & {
-  success: true;
-};
-
-type FailureResponse = ActionResponse & {
-  success: false;
 };
 
 type ApiSuccessResponse<T> = NextResponse<SuccessResponse<T>>;

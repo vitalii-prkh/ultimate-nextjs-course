@@ -8,6 +8,7 @@ import {getQuestion, incrementViews} from "@/lib/actions/question.actions";
 import {getAnswers} from "@/lib/actions/answer.actions";
 import {buildPath} from "@/lib/path/buildPath";
 import {formatNumber, getTimeStamp} from "@/lib/utils";
+import {hasVoted} from "@/lib/actions/vote.actions";
 import {UserAvatar} from "@/components/UserAvatar";
 import {Metric} from "@/components/Metric";
 import {CardTagView} from "@/components/cards/CardTagView";
@@ -23,6 +24,8 @@ type PageQuestionProps = {
 async function PageQuestionById(props: PageQuestionProps) {
   const {questionId} = await props.params;
   const {success, data} = await getQuestion({questionId});
+  const targetType = "question";
+  const targetId = questionId;
 
   after(async () => {
     await incrementViews({questionId});
@@ -39,6 +42,7 @@ async function PageQuestionById(props: PageQuestionProps) {
     filter: FILTERS.NEWEST,
   });
 
+  const hasVotedPromise = hasVoted({targetId, targetType});
   const {author} = data;
 
   return (
@@ -62,12 +66,15 @@ async function PageQuestionById(props: PageQuestionProps) {
             </Link>
           </div>
           <div className="flex justify-end">
-            <Votes
-              upvotes={data.upvotes}
-              downvotes={data.downvotes}
-              hasUpvoted={true}
-              hasDownvoted={false}
-            />
+            <React.Suspense fallback={<div>Loading...</div>}>
+              <Votes
+                hasVotedPromise={hasVotedPromise}
+                upvotes={data.upvotes}
+                downvotes={data.downvotes}
+                targetType={targetType}
+                targetId={targetId}
+              />
+            </React.Suspense>
           </div>
         </div>
         <h2 className="h2-semibold text-dark200_light900 mt-3 w-full">

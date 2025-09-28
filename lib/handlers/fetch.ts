@@ -1,4 +1,4 @@
-import {ActionResponse, FailureResponse, SuccessResponse} from "@/types/global";
+import {FailureResponse, SuccessResponse} from "@/types/global";
 import {log} from "@/lib/log";
 import {handleError} from "@/lib/handlers/error";
 import {RequestError} from "@/lib/http-errors";

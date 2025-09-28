@@ -1,4 +1,13 @@
-import {InferSchemaType, Require_id, Schema, model, models} from "mongoose";
+import {
+  InferSchemaType,
+  HydratedDocument,
+  ObjectIdToString,
+  Require_id,
+  Schema,
+  model,
+  models,
+  Model,
+} from "mongoose";
 
 export const InteractionActionEnums = [
   "view",
@@ -11,9 +20,13 @@ export const InteractionActionEnums = [
   "search",
 ] as const;
 
-export type TInteractionType = InferSchemaType<typeof schema>;
+export type TInteractionDoc = InferSchemaType<typeof schema>;
 
-export type TInteractionData = Require_id<TInteractionType>;
+export type TInteractionHydrated = HydratedDocument<TInteractionDoc>;
+
+export type TInteractionJSON = ObjectIdToString<Require_id<TInteractionDoc>>;
+
+export type TInteractionModel = Model<TInteractionDoc>;
 
 const schema = new Schema(
   {
@@ -44,6 +57,7 @@ const schema = new Schema(
 );
 
 const Interaction =
-  models?.Interaction || model<TInteractionType>("Interaction", schema);
+  (models?.Interaction as TInteractionModel) ||
+  model<TInteractionDoc, TInteractionModel>("Interaction", schema);
 
 export default Interaction;
