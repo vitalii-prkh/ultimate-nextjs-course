@@ -6,9 +6,14 @@ import {buildPath} from "@/lib/path/buildPath";
 import {getTimeStamp} from "@/lib/utils";
 import {UserAvatar} from "@/components/UserAvatar";
 import {Preview} from "@/components/editor/Preview";
+import {Votes} from "@/components/votes/Votes";
+import {hasVoted} from "@/lib/actions/vote.actions";
 
 export function CardAnswer(props: TAnswerInList) {
   const {author} = props;
+  const targetType = "answer";
+  const targetId = props._id;
+  const hasVotedPromise = hasVoted({targetId, targetType});
 
   return (
     <article className="light-border border-b py-10">
@@ -37,7 +42,17 @@ export function CardAnswer(props: TAnswerInList) {
             </p>
           </Link>
         </div>
-        <div className="flex justify-end">Votes</div>
+        <div className="flex justify-end">
+          <React.Suspense fallback={<div>Loading...</div>}>
+            <Votes
+              hasVotedPromise={hasVotedPromise}
+              upvotes={props.upvotes}
+              downvotes={props.downvotes}
+              targetType={targetType}
+              targetId={targetId}
+            />
+          </React.Suspense>
+        </div>
       </div>
       <Preview content={props.content} />
     </article>
