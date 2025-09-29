@@ -1,8 +1,21 @@
-import {InferSchemaType, Require_id, Schema, model, models} from "mongoose";
+import {
+  InferSchemaType,
+  HydratedDocument,
+  ObjectIdToString,
+  Require_id,
+  Schema,
+  model,
+  models,
+  Model,
+} from "mongoose";
 
-export type TCollectionType = InferSchemaType<typeof schema>;
+export type TCollectionDoc = InferSchemaType<typeof schema>;
 
-export type TCollectionData = Require_id<TCollectionType>;
+export type TCollectionHydrated = HydratedDocument<TCollectionDoc>;
+
+export type TCollectionJSON = ObjectIdToString<Require_id<TCollectionDoc>>;
+
+export type TCollectionModel = Model<TCollectionDoc>;
 
 const schema = new Schema(
   {
@@ -23,6 +36,7 @@ const schema = new Schema(
 );
 
 const Collection =
-  models?.Collection || model<TCollectionType>("Collection", schema);
+  (models?.Collection as TCollectionModel) ||
+  model<TCollectionDoc, TCollectionModel>("Collection", schema);
 
 export default Collection;

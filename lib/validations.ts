@@ -195,3 +195,7 @@ export const schemaCreateInteraction = z.object({
   actionId: z.string().min(1),
   authorId: z.string().min(1),
 });
+
+export const schemaCollectionBase = z.object({
+  questionId: z.string().min(1, "Question ID is required"),
+});
