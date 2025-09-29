@@ -2,18 +2,25 @@
 
 import mongoose, {FilterQuery} from "mongoose";
 import {revalidatePath} from "next/cache";
+import {after} from "next/server";
 import {z} from "zod";
 import Question from "@/db/question.model";
 import Answer, {TAnswerJSON} from "@/db/answer.model";
+import Vote from "@/db/vote.model";
 import {TUserJSON} from "@/db/user.model";
 import {ROUTES} from "@/refs/routes";
 import {FILTERS} from "@/refs/filters";
 import {action} from "@/lib/handlers/action";
-import {schemaAnswerAction, schemaGetAnswers} from "@/lib/validations";
+import {
+  schemaAnswerAction,
+  schemaGetAnswers,
+  schemaDeleteAnswer,
+} from "@/lib/validations";
 import {buildPath} from "@/lib/path/buildPath";
 import {handleError} from "@/lib/handlers/error";
 import {NotFoundError} from "@/lib/http-errors";
 import {FailureResponse, SuccessResponse} from "@/types/global";
+import {createInteraction} from "@/lib/actions/interaction.actions";
 
 type TCreateAnswersParams = z.infer<typeof schemaAnswerAction>;
 
@@ -144,6 +151,73 @@ export async function getAnswers(
         total: totalAnswers,
         isNext: totalAnswers > skip + answers.length,
       },
+    };
+  } catch (error) {
+    return handleError(error, "server");
+  }
+}
+
+export async function deleteAnswer(
+  params: z.infer<typeof schemaDeleteAnswer>,
+): Promise<SuccessResponse | FailureResponse> {
+  const validationResult = await action({
+    params,
+    schema: schemaDeleteAnswer,
+    authorize: true,
+  });
+
+  if (validationResult instanceof Error) {
+    return handleError(validationResult, "server");
+  }
+
+  const {answerId} = validationResult.params!;
+  const {user} = validationResult.session!;
+
+  try {
+    const answer = await Answer.findById(answerId);
+
+    if (!answer) {
+      throw new Error("Answer not found");
+    }
+
+    if (answer.author.toString() !== user?.id) {
+      throw new Error("You're not allowed to delete this answer");
+    }
+
+    // reduce the question answers count
+    await Question.findByIdAndUpdate(
+      answer.question,
+      {
+        $inc: {
+          answers: -1,
+        },
+      },
+      {
+        new: true,
+      },
+    );
+
+    // delete votes associated with answer
+    await Vote.deleteMany({actionId: answerId, actionType: "answer"});
+
+    // delete the answer
+    await Answer.findByIdAndDelete(answerId);
+
+    // log the interaction
+    after(async () => {
+      await createInteraction({
+        action: "delete",
+        actionId: answerId,
+        actionTarget: "answer",
+        authorId: user?.id as string,
+      });
+    });
+
+    revalidatePath(buildPath(ROUTES.PROFILE_BY_ID, {profileId: user?.id}));
+
+    return {
+      success: true,
+      data: undefined,
     };
   } catch (error) {
     return handleError(error, "server");

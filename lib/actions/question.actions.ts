@@ -2,12 +2,18 @@
 
 import mongoose, {FilterQuery, Types} from "mongoose";
 import {z} from "zod";
+import {revalidatePath} from "next/cache";
+import {after} from "next/server";
 import Question, {TQuestionHydrated, TQuestionJSON} from "@/db/question.model";
 import Tag, {TTagHydrated, TTagJSON} from "@/db/tag.model";
 import TagQuestion, {TTagQuestionData} from "@/db/tag-question.model";
+import Collection from "@/db/collection.model";
+import Vote from "@/db/vote.model";
+import Answer from "@/db/answer.model";
 import {TUserJSON} from "@/db/user.model";
 import {FILTERS} from "@/refs/filters";
 import {action} from "@/lib/handlers/action";
+import {createInteraction} from "@/lib/actions/interaction.actions";
 import dbConnect from "@/lib/mongoose";
 import {
   schemaAskQuestion,
@@ -15,10 +21,13 @@ import {
   schemaGetQuestion,
   schemaSearchParams,
   schemaIncrementViews,
+  schemaDeleteQuestion,
 } from "@/lib/validations";
 import {handleError} from "@/lib/handlers/error";
 import {FailureResponse, SuccessResponse} from "@/types/global";
 import {NotFoundError} from "@/lib/http-errors";
+import {buildPath} from "@/lib/path/buildPath";
+import {ROUTES} from "@/refs/routes";
 
 type TPostQuestionParams = Pick<TQuestionJSON, "title" | "content" | "tags">;
 
@@ -392,6 +401,108 @@ export async function getHotQuestions(): Promise<
       data: JSON.parse(JSON.stringify(questions)),
     };
   } catch (error) {
+    return handleError(error, "server");
+  }
+}
+
+export async function deleteQuestion(
+  params: z.infer<typeof schemaDeleteQuestion>,
+): Promise<SuccessResponse | FailureResponse> {
+  const validationResult = await action({
+    params,
+    schema: schemaDeleteQuestion,
+    authorize: true,
+  });
+
+  if (validationResult instanceof Error) {
+    return handleError(validationResult, "server");
+  }
+
+  const {questionId} = validationResult.params!;
+  const {user} = validationResult.session!;
+  const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+
+    const question = await Question.findById(questionId).session(session);
+
+    if (!question) {
+      throw new Error("Question not found");
+    }
+
+    if (question.author.toString() !== user?.id) {
+      throw new Error("You are not authorized to delete this question");
+    }
+
+    // Delete related entries inside the transaction
+    await Collection.deleteMany({question: questionId}).session(session);
+    await TagQuestion.deleteMany({question: questionId}).session(session);
+
+    // For all tags of Question, find them and reduce their count
+    if (question.tags.length > 0) {
+      await Tag.updateMany(
+        {
+          _id: {
+            $in: question.tags,
+          },
+        },
+        {
+          $inc: {
+            questions: -1,
+          },
+        },
+        {session},
+      );
+    }
+
+    //  Remove all votes of the question
+    await Vote.deleteMany({
+      actionId: questionId,
+      actionType: "question",
+    }).session(session);
+
+    // Remove all answers and their votes of the question
+    const answers = await Answer.find({question: questionId}).session(session);
+
+    if (answers.length > 0) {
+      await Answer.deleteMany({question: questionId}).session(session);
+
+      await Vote.deleteMany({
+        actionId: {
+          $in: answers.map((answer) => answer.id),
+        },
+        actionType: "answer",
+      }).session(session);
+    }
+
+    await Question.findByIdAndDelete(questionId).session(session);
+
+    // log the interaction
+    after(async () => {
+      await createInteraction({
+        action: "delete",
+        actionId: questionId,
+        actionTarget: "question",
+        authorId: user?.id as string,
+      });
+    });
+
+    await session.commitTransaction();
+
+    session.endSession();
+
+    revalidatePath(buildPath(ROUTES.PROFILE_BY_ID, {profileId: user?.id}));
+
+    return {
+      success: true,
+      data: undefined,
+    };
+  } catch (error) {
+    await session.abortTransaction();
+
+    session.endSession();
+
     return handleError(error, "server");
   }
 }

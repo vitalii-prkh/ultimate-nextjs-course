@@ -203,3 +203,33 @@ export const schemaCollectionBase = z.object({
 export const schemaGetUser = z.object({
   userId: z.string().min(1, "Question ID is required"),
 });
+
+export const schemaGetUserQuestions = schemaSearchParams
+  .pick({
+    page: true,
+    pageSize: true,
+  })
+  .extend({
+    userId: z.string().min(1, "User ID is required"),
+  });
+
+export const schemaGetUserAnswers = schemaSearchParams
+  .pick({
+    page: true,
+    pageSize: true,
+  })
+  .extend({
+    userId: z.string().min(1, "User ID is required"),
+  });
+
+export const schemaGetUserTags = z.object({
+  userId: z.string().min(1, "User ID is required"),
+});
+
+export const schemaDeleteQuestion = z.object({
+  questionId: z.string().min(1, "Question ID is required"),
+});
+
+export const schemaDeleteAnswer = z.object({
+  answerId: z.string().min(1, "Answer ID is required"),
+});

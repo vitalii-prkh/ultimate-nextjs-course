@@ -6,9 +6,11 @@ import {getTimeStamp} from "@/lib/utils";
 import {buildPath} from "@/lib/path/buildPath";
 import {CardTag} from "@/components/cards/CardTag";
 import {Metric} from "@/components/Metric";
+import {UpdateDeleteActions} from "@/components/user/UpdateDeleteActions";
 
 type CardQuestionProps = {
   data: TQuestionInList | TTagQuestionInList;
+  showActionBtns?: boolean;
 };
 
 export function CardQuestion(props: CardQuestionProps) {
@@ -16,8 +18,8 @@ export function CardQuestion(props: CardQuestionProps) {
 
   return (
     <div className="card-wrapper rounded-[10px] p-9 sm:px-11">
-      <div className="flex-coll-reverse flex items-start justify-between gap-5 sm:flex-row">
-        <div>
+      <div className="flex flex-col-reverse items-center justify-between gap-5 sm:flex-row">
+        <div className="flex-1">
           <span className="subtle-regular text-dark400_light700 line-clamp-1 flex sm:hidden">
             {getTimeStamp(data.createdAt)}
           </span>
@@ -27,6 +29,12 @@ export function CardQuestion(props: CardQuestionProps) {
             </h3>
           </Link>
         </div>
+        {props.showActionBtns && (
+          <UpdateDeleteActions
+            type="Question"
+            itemId={data._id}
+          />
+        )}
       </div>
       <div className="mt-3.5 flex w-full flex-wrap gap-2">
         {data.tags.map((tag) => (

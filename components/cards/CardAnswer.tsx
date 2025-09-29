@@ -3,24 +3,41 @@ import Link from "next/link";
 import {ROUTES} from "@/refs/routes";
 import {TAnswerInList} from "@/lib/actions/answer.actions";
 import {buildPath} from "@/lib/path/buildPath";
-import {getTimeStamp} from "@/lib/utils";
+import {getTimeStamp, cn} from "@/lib/utils";
+import {hasVoted} from "@/lib/actions/vote.actions";
 import {UserAvatar} from "@/components/UserAvatar";
 import {Preview} from "@/components/editor/Preview";
 import {Votes} from "@/components/votes/Votes";
-import {hasVoted} from "@/lib/actions/vote.actions";
+import {UpdateDeleteActions} from "@/components/user/UpdateDeleteActions";
 
-export function CardAnswer(props: TAnswerInList) {
+type CardAnswerProps = TAnswerInList & {
+  containerClasses?: string;
+  showReadMore?: boolean;
+  showActionBtns?: boolean;
+};
+
+export function CardAnswer(props: CardAnswerProps) {
   const {author} = props;
   const targetType = "answer";
   const targetId = props._id;
   const hasVotedPromise = hasVoted({targetId, targetType});
 
   return (
-    <article className="light-border border-b py-10">
+    <article
+      className={cn("light-border border-b py-10", props.containerClasses)}
+    >
       <span
-        id={props._id}
+        id={`answer-${props._id}`}
         className="hash-span"
       />
+      {props.showActionBtns && (
+        <div className="mb-2">
+          <UpdateDeleteActions
+            type="Answer"
+            itemId={props._id}
+          />
+        </div>
+      )}
       <div className="mb-5 flex flex-col-reverse justify-between gap-5 sm:flex-row sm:items-center sm:gap-2">
         <div className="flex flex-1 items-start gap-1 sm:items-center">
           <UserAvatar
@@ -55,6 +72,14 @@ export function CardAnswer(props: TAnswerInList) {
         </div>
       </div>
       <Preview content={props.content} />
+      {props.showReadMore && (
+        <Link
+          href={`${buildPath(ROUTES.QUESTION_BY_ID, {questionId: props.question})}#answer-${props._id}`}
+          className="body-semibold text-primary-500 font-space-grotesk relative z-10"
+        >
+          <p className="mt-1">Read more...</p>
+        </Link>
+      )}
     </article>
   );
 }
