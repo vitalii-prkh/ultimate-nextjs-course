@@ -8,6 +8,7 @@ import {DataRenderer} from "@/components/DataRenderer";
 import {HomeTags} from "@/components/filters/HomeTags";
 import {CardUser} from "@/components/cards/CardUser";
 import {CommonFilters} from "@/components/CommonFilters";
+import {Pagination} from "@/components/Pagination";
 
 type PageCommunityProps = {
   searchParams: Promise<{
@@ -60,6 +61,10 @@ async function PageCommunity(props: PageCommunityProps) {
             ))}
           </div>
         )}
+      />
+      <Pagination
+        page={page}
+        isNext={data?.isNext || false}
       />
     </React.Fragment>
   );

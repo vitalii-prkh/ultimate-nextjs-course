@@ -1,3 +1,4 @@
+import React from "react";
 import {ROUTES} from "@/refs/routes";
 import {EMPTY_QUESTION} from "@/refs/states";
 import {COLLECTION_FILTERS} from "@/refs/filters";
@@ -6,6 +7,7 @@ import {LocalSearch} from "@/components/search/LocalSearch";
 import {CommonFilters} from "@/components/CommonFilters";
 import {DataRenderer} from "@/components/DataRenderer";
 import {CardQuestion} from "@/components/cards/CardQuestion";
+import {Pagination} from "@/components/Pagination";
 
 type PageHomeProps = {
   searchParams: Promise<{
@@ -26,7 +28,7 @@ async function PageCollections(props: PageHomeProps) {
   });
 
   return (
-    <>
+    <React.Fragment>
       <section className="flex w-full flex-col-reverse justify-between gap-4 sm:flex-row sm:items-center">
         <h1 className="h1-bold text-dark100_light900">Saved Questions</h1>
       </section>
@@ -58,7 +60,11 @@ async function PageCollections(props: PageHomeProps) {
           </div>
         )}
       />
-    </>
+      <Pagination
+        page={page}
+        isNext={data?.isNext || false}
+      />
+    </React.Fragment>
   );
 }
 

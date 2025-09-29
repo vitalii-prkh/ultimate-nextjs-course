@@ -5,8 +5,11 @@ import {TAnswerInList} from "@/lib/actions/answer.actions";
 import {DataRenderer} from "@/components/DataRenderer";
 import {CardAnswer} from "@/components/cards/CardAnswer";
 import {CommonFilters} from "@/components/CommonFilters";
+import {Pagination} from "@/components/Pagination";
 
 type AllAnswersProps = {
+  page: number;
+  isNext: boolean;
   success: boolean;
   total: number;
   data: TAnswerInList[] | null | undefined;
@@ -44,6 +47,10 @@ export function AllAnswers(props: AllAnswersProps) {
             ))}
           </div>
         )}
+      />
+      <Pagination
+        page={props.page}
+        isNext={props.isNext}
       />
     </div>
   );

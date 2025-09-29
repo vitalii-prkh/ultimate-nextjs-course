@@ -128,6 +128,8 @@ async function PageQuestionById(props: PageQuestionProps) {
       </div>
       <section className="my-5">
         <AllAnswers
+          page={Number(page) || 1}
+          isNext={answers.data?.isNext || false}
           data={answers?.data?.data}
           success={answers?.success}
           error={answers?.error}

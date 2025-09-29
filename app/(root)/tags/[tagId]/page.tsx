@@ -6,6 +6,7 @@ import {buildPath} from "@/lib/path/buildPath";
 import {LocalSearch} from "@/components/search/LocalSearch";
 import {DataRenderer} from "@/components/DataRenderer";
 import {CardQuestion} from "@/components/cards/CardQuestion";
+import {Pagination} from "@/components/Pagination";
 
 type PageTagByIdProps = {
   params: Promise<{tagId: string}>;
@@ -47,7 +48,7 @@ async function PageTagById(props: PageTagByIdProps) {
         data={data?.data}
         empty={EMPTY_QUESTION}
         render={(questions) => (
-          <div className="mt-10 flex w-full flex-wrap gap-4">
+          <div className="mt-10 flex w-full flex-col gap-6">
             {questions.map((question) => (
               <CardQuestion
                 key={question._id}
@@ -56,6 +57,10 @@ async function PageTagById(props: PageTagByIdProps) {
             ))}
           </div>
         )}
+      />
+      <Pagination
+        page={page}
+        isNext={data?.isNext || false}
       />
     </React.Fragment>
   );

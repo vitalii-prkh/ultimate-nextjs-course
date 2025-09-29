@@ -7,6 +7,7 @@ import {LocalSearch} from "@/components/search/LocalSearch";
 import {CardTagView} from "@/components/cards/CardTagView";
 import {DataRenderer} from "@/components/DataRenderer";
 import {CommonFilters} from "@/components/CommonFilters";
+import {Pagination} from "@/components/Pagination";
 
 type PageTagsProps = {
   searchParams: Promise<{
@@ -56,6 +57,10 @@ async function PageTags(props: PageTagsProps) {
             ))}
           </div>
         )}
+      />
+      <Pagination
+        page={page}
+        isNext={data?.isNext || false}
       />
     </React.Fragment>
   );

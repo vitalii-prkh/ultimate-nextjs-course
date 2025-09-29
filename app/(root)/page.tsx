@@ -1,3 +1,4 @@
+import React from "react";
 import Link from "next/link";
 import {ROUTES} from "@/refs/routes";
 import {EMPTY_QUESTION} from "@/refs/states";
@@ -9,6 +10,7 @@ import {HomeTags} from "@/components/filters/HomeTags";
 import {CommonFilters} from "@/components/CommonFilters";
 import {DataRenderer} from "@/components/DataRenderer";
 import {CardQuestion} from "@/components/cards/CardQuestion";
+import {Pagination} from "@/components/Pagination";
 
 type PageHomeProps = {
   searchParams: Promise<{
@@ -29,7 +31,7 @@ async function PageHome(props: PageHomeProps) {
   });
 
   return (
-    <>
+    <React.Fragment>
       <section className="flex w-full flex-col-reverse justify-between gap-4 sm:flex-row sm:items-center">
         <h1 className="h1-bold text-dark100_light900">All Questions</h1>
         <Button
@@ -69,7 +71,11 @@ async function PageHome(props: PageHomeProps) {
           </div>
         )}
       />
-    </>
+      <Pagination
+        page={page}
+        isNext={data?.isNext || false}
+      />
+    </React.Fragment>
   );
 }
 
