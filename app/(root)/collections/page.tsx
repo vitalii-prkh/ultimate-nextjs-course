@@ -3,7 +3,7 @@ import {EMPTY_QUESTION} from "@/refs/states";
 import {COLLECTION_FILTERS} from "@/refs/filters";
 import {getSavedQuestions} from "@/lib/actions/collection.actions";
 import {LocalSearch} from "@/components/search/LocalSearch";
-import {HomeTags} from "@/components/filters/HomeTags";
+import {CommonFilters} from "@/components/CommonFilters";
 import {DataRenderer} from "@/components/DataRenderer";
 import {CardQuestion} from "@/components/cards/CardQuestion";
 
@@ -12,17 +12,17 @@ type PageHomeProps = {
     page?: string;
     pageSize?: string;
     query?: string;
-    tag?: string;
+    filter?: string;
   }>;
 };
 
 async function PageCollections(props: PageHomeProps) {
-  const {page, pageSize, query, tag} = await props.searchParams;
+  const {page, pageSize, query, filter} = await props.searchParams;
   const {success, data, error} = await getSavedQuestions({
     page: Number(page) || 1,
     pageSize: Number(pageSize) || 10,
     query: query || "",
-    filter: tag || "",
+    filter: filter || "",
   });
 
   return (
@@ -37,8 +37,11 @@ async function PageCollections(props: PageHomeProps) {
           placeholder="Search questions..."
           className="flex-1"
         />
+        <CommonFilters
+          filters={COLLECTION_FILTERS}
+          otherClasses="min-h-[56px] sm:min-2-[170px]"
+        />
       </section>
-      <HomeTags options={COLLECTION_FILTERS} />
       <DataRenderer
         success={success}
         error={error}

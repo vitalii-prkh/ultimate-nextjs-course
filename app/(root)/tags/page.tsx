@@ -4,40 +4,43 @@ import {TAG_FILTERS} from "@/refs/filters";
 import {EMPTY_TAGS} from "@/refs/states";
 import {getTags} from "@/lib/actions/tag.actions";
 import {LocalSearch} from "@/components/search/LocalSearch";
-import {HomeTags} from "@/components/filters/HomeTags";
 import {CardTagView} from "@/components/cards/CardTagView";
 import {DataRenderer} from "@/components/DataRenderer";
+import {CommonFilters} from "@/components/CommonFilters";
 
 type PageTagsProps = {
   searchParams: Promise<{
     page?: string;
     pageSize?: string;
     query?: string;
-    tag?: string;
+    filter?: string;
   }>;
 };
 
 async function PageTags(props: PageTagsProps) {
-  const {page, pageSize, query, tag} = await props.searchParams;
+  const {page, pageSize, query, filter} = await props.searchParams;
   const {success, data, error} = await getTags({
     page: Number(page) || 1,
     pageSize: Number(pageSize) || 10,
     query: query || "",
-    filter: tag || "",
+    filter: filter || "",
   });
 
   return (
     <React.Fragment>
       <h1 className="h1-bold text-dark100_light900 text-3xl">Tags</h1>
-      <section className="mt-11">
+      <section className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center">
         <LocalSearch
           route={ROUTES.TAGS}
           image="/icons/search.svg"
           placeholder="Search tags..."
           className="flex-1"
         />
+        <CommonFilters
+          filters={TAG_FILTERS}
+          otherClasses="min-h-[56px] sm:min-w-[170px]"
+        />
       </section>
-      <HomeTags options={TAG_FILTERS} />
       <DataRenderer
         success={success}
         error={error}

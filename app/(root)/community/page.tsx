@@ -7,23 +7,24 @@ import {LocalSearch} from "@/components/search/LocalSearch";
 import {DataRenderer} from "@/components/DataRenderer";
 import {HomeTags} from "@/components/filters/HomeTags";
 import {CardUser} from "@/components/cards/CardUser";
+import {CommonFilters} from "@/components/CommonFilters";
 
 type PageCommunityProps = {
   searchParams: Promise<{
     page?: string;
     pageSize?: string;
     query?: string;
-    tag?: string;
+    filter?: string;
   }>;
 };
 
 async function PageCommunity(props: PageCommunityProps) {
-  const {page, pageSize, query, tag} = await props.searchParams;
+  const {page, pageSize, query, filter} = await props.searchParams;
   const {success, data, error} = await getUsers({
     page: Number(page) || 1,
     pageSize: Number(pageSize) || 10,
     query: query || "",
-    filter: tag || "",
+    filter: filter || "",
   });
 
   return (
@@ -31,12 +32,16 @@ async function PageCommunity(props: PageCommunityProps) {
       <section>
         <h1 className="h1-bold text-dark100_light900"></h1>
       </section>
-      <section className="mt-11">
+      <section className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center">
         <LocalSearch
           route={ROUTES.COMMUNITY}
           image="/icons/search.svg"
           placeholder="Search users..."
           className="flex-1"
+        />
+        <CommonFilters
+          filters={USER_FILTERS}
+          otherClasses="min-h-[56px] sm:min-2-[170px]"
         />
       </section>
       <HomeTags options={USER_FILTERS} />

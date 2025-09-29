@@ -16,8 +16,8 @@ type HomeTagsProps = {
 export function HomeTags(props: HomeTagsProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const tag = searchParams.get("tag") || "";
-  const [value, setValue] = React.useState(tag);
+  const filter = searchParams.get("filter") || "";
+  const [value, setValue] = React.useState(filter);
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     if (event.currentTarget.id === value) {
       setValue("");

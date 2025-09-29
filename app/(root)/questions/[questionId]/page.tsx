@@ -3,7 +3,6 @@ import {after} from "next/server";
 import {redirect} from "next/navigation";
 import Link from "next/link";
 import {ROUTES} from "@/refs/routes";
-import {FILTERS} from "@/refs/filters";
 import {getQuestion, incrementViews} from "@/lib/actions/question.actions";
 import {getAnswers} from "@/lib/actions/answer.actions";
 import {buildPath} from "@/lib/path/buildPath";
@@ -21,10 +20,16 @@ import {SaveQuestion} from "@/components/questions/SaveQuestion";
 
 type PageQuestionProps = {
   params: Promise<{questionId: string}>;
+  searchParams: Promise<{
+    page?: string;
+    pageSize?: string;
+    filter?: string;
+  }>;
 };
 
 async function PageQuestionById(props: PageQuestionProps) {
   const {questionId} = await props.params;
+  const {page, pageSize, filter} = await props.searchParams;
   const {success, data} = await getQuestion({questionId});
   const targetType = "question";
   const targetId = questionId;
@@ -39,9 +44,9 @@ async function PageQuestionById(props: PageQuestionProps) {
 
   const answers = await getAnswers({
     questionId,
-    page: 1,
-    pageSize: 10,
-    filter: FILTERS.NEWEST,
+    page: Number(page) || 1,
+    pageSize: Number(pageSize) || 10,
+    filter: filter || "",
   });
 
   const hasVotedPromise = hasVoted({targetId, targetType});

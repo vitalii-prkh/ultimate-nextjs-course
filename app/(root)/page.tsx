@@ -6,6 +6,7 @@ import {getQuestions} from "@/lib/actions/question.actions";
 import {Button} from "@/components/ui/button";
 import {LocalSearch} from "@/components/search/LocalSearch";
 import {HomeTags} from "@/components/filters/HomeTags";
+import {CommonFilters} from "@/components/CommonFilters";
 import {DataRenderer} from "@/components/DataRenderer";
 import {CardQuestion} from "@/components/cards/CardQuestion";
 
@@ -14,17 +15,17 @@ type PageHomeProps = {
     page?: string;
     pageSize?: string;
     query?: string;
-    tag?: string;
+    filter?: string;
   }>;
 };
 
 async function PageHome(props: PageHomeProps) {
-  const {page, pageSize, query, tag} = await props.searchParams;
+  const {page, pageSize, query, filter} = await props.searchParams;
   const {success, data, error} = await getQuestions({
     page: Number(page) || 1,
     pageSize: Number(pageSize) || 10,
     query: query || "",
-    filter: tag || "",
+    filter: filter || "",
   });
 
   return (
@@ -38,12 +39,17 @@ async function PageHome(props: PageHomeProps) {
           <Link href={ROUTES.ASK_QUESTION}>Ask a Question</Link>
         </Button>
       </section>
-      <section className="mt-11">
+      <section className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center">
         <LocalSearch
           route={ROUTES.HOME}
           image="/icons/search.svg"
           placeholder="Search questions..."
           className="flex-1"
+        />
+        <CommonFilters
+          filters={HOME_FILTERS}
+          otherClasses="min-h-[56px] sm:min-w-[170px]"
+          containerClasses="hidden max-md:flex"
         />
       </section>
       <HomeTags options={HOME_FILTERS} />
