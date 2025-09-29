@@ -3,11 +3,14 @@
 import {FilterQuery} from "mongoose";
 import {z} from "zod";
 import User, {TUserJSON} from "@/db/user.model";
+import Question from "@/db/question.model";
+import Answer from "@/db/answer.model";
 import {FILTERS} from "@/refs/filters";
 import {action} from "@/lib/handlers/action";
-import {schemaSearchParams} from "@/lib/validations";
+import {schemaSearchParams, schemaGetUser} from "@/lib/validations";
 import {handleError} from "@/lib/handlers/error";
 import {FailureResponse, SuccessResponse} from "@/types/global";
+import {NotFoundError} from "@/lib/http-errors";
 
 type TGetUsersParams = z.infer<typeof schemaSearchParams>;
 
@@ -72,6 +75,51 @@ export async function getUsers(
         data: JSON.parse(JSON.stringify(users)),
         total: totalUsers,
         isNext: totalUsers > skip + users.length,
+      },
+    };
+  } catch (error) {
+    return handleError(error, "server");
+  }
+}
+
+type TGetUserParams = z.infer<typeof schemaGetUser>;
+
+type TGetUserData = {
+  user: TUserJSON;
+  totalQuestions: number;
+  totalAnswers: number;
+};
+
+export async function getUser(
+  params: TGetUserParams,
+): Promise<SuccessResponse<TGetUserData> | FailureResponse> {
+  const validationResult = await action({
+    params,
+    schema: schemaGetUser,
+  });
+
+  if (validationResult instanceof Error) {
+    return handleError(validationResult, "server");
+  }
+
+  const {userId} = validationResult.params!;
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      throw new NotFoundError("User");
+    }
+
+    const totalQuestions = await Question.countDocuments({author: userId});
+    const totalAnswers = await Answer.countDocuments({author: userId});
+
+    return {
+      success: true,
+      data: {
+        user: JSON.parse(JSON.stringify(user)),
+        totalQuestions,
+        totalAnswers,
       },
     };
   } catch (error) {
