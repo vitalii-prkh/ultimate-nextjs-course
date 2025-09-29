@@ -9,6 +9,7 @@ import {getAnswers} from "@/lib/actions/answer.actions";
 import {buildPath} from "@/lib/path/buildPath";
 import {formatNumber, getTimeStamp} from "@/lib/utils";
 import {hasVoted} from "@/lib/actions/vote.actions";
+import {hasSaveQuestion} from "@/lib/actions/collection.actions";
 import {UserAvatar} from "@/components/UserAvatar";
 import {Metric} from "@/components/Metric";
 import {CardTagView} from "@/components/cards/CardTagView";
@@ -44,6 +45,7 @@ async function PageQuestionById(props: PageQuestionProps) {
   });
 
   const hasVotedPromise = hasVoted({targetId, targetType});
+  const hasSavedPromise = hasSaveQuestion({questionId});
   const {author} = data;
 
   return (
@@ -66,7 +68,7 @@ async function PageQuestionById(props: PageQuestionProps) {
               </p>
             </Link>
           </div>
-          <div className="flex justify-end">
+          <div className="flex items-center justify-end gap-4">
             <React.Suspense fallback={<div>Loading...</div>}>
               <Votes
                 hasVotedPromise={hasVotedPromise}
@@ -77,7 +79,10 @@ async function PageQuestionById(props: PageQuestionProps) {
               />
             </React.Suspense>
             <React.Suspense fallback={<div>Loading...</div>}>
-              <SaveQuestion questionId={questionId} />
+              <SaveQuestion
+                hasSavedPromise={hasSavedPromise}
+                questionId={questionId}
+              />
             </React.Suspense>
           </div>
         </div>

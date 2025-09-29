@@ -46,7 +46,9 @@ export async function toggleSaveQuestion(
     });
 
     if (collection) {
-      await Collection.findByIdAndDelete(collection.id);
+      await Collection.findByIdAndDelete(collection._id);
+
+      revalidatePath(buildPath(ROUTES.QUESTION_BY_ID, {questionId}));
 
       return {
         success: true,
@@ -67,6 +69,45 @@ export async function toggleSaveQuestion(
       success: true,
       data: {
         saved: true,
+      },
+    };
+  } catch (error) {
+    return handleError(error, "server");
+  }
+}
+
+type THasSaveQuestionParams = z.infer<typeof schemaCollectionBase>;
+
+type THasSaveQuestionData = {
+  saved: boolean;
+};
+
+export async function hasSaveQuestion(
+  params: THasSaveQuestionParams,
+): Promise<SuccessResponse<THasSaveQuestionData> | FailureResponse> {
+  const validationResult = await action({
+    params,
+    schema: schemaCollectionBase,
+    authorize: true,
+  });
+
+  if (validationResult instanceof Error) {
+    return handleError(validationResult, "server");
+  }
+
+  const {questionId} = validationResult.params!;
+  const userId = validationResult.session?.user?.id;
+
+  try {
+    const collection = await Collection.findOne({
+      question: questionId,
+      author: userId,
+    });
+
+    return {
+      success: true,
+      data: {
+        saved: Boolean(collection),
       },
     };
   } catch (error) {

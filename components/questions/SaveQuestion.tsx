@@ -5,9 +5,11 @@ import {useSession} from "next-auth/react";
 import Image from "next/image";
 import {toast} from "sonner";
 import {toggleSaveQuestion} from "@/lib/actions/collection.actions";
+import {hasSaveQuestion} from "@/lib/actions/collection.actions";
 
 type SaveQuestionProps = {
   questionId: string;
+  hasSavedPromise: Promise<Awaited<ReturnType<typeof hasSaveQuestion>>>;
 };
 
 export function SaveQuestion(props: SaveQuestionProps) {
@@ -15,6 +17,7 @@ export function SaveQuestion(props: SaveQuestionProps) {
   const [isPending, setPending] = React.useState(false);
   const session = useSession();
   const userId = session.data?.user?.id;
+  const {data} = React.use(props.hasSavedPromise);
 
   const handleClick = async (event: React.MouseEvent) => {
     event.preventDefault();
@@ -51,11 +54,9 @@ export function SaveQuestion(props: SaveQuestionProps) {
     }
   };
 
-  const hasUnsaved = false;
-
   return (
     <Image
-      src={hasUnsaved ? "/icons/star-filled.svg" : "/icons/star-red.svg"}
+      src={data?.saved ? "/icons/star-filled.svg" : "/icons/star-red.svg"}
       alt="Save Question"
       width={18}
       height={18}
