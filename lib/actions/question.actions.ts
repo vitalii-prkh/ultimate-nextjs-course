@@ -8,6 +8,7 @@ import TagQuestion, {TTagQuestionData} from "@/db/tag-question.model";
 import {TUserJSON} from "@/db/user.model";
 import {FILTERS} from "@/refs/filters";
 import {action} from "@/lib/handlers/action";
+import dbConnect from "@/lib/mongoose";
 import {
   schemaAskQuestion,
   schemaUpdateQuestion,
@@ -370,6 +371,27 @@ export async function incrementViews(
       data: {
         views: question.views,
       },
+    };
+  } catch (error) {
+    return handleError(error, "server");
+  }
+}
+
+type TGetHotQuestionsData = Array<Omit<TQuestionJSON, "views" | "upvotes">>;
+
+export async function getHotQuestions(): Promise<
+  SuccessResponse<TGetHotQuestionsData> | FailureResponse
+> {
+  try {
+    await dbConnect();
+
+    const questions = await Question.find()
+      .sort({views: -1, upvotes: -1})
+      .limit(5);
+
+    return {
+      success: true,
+      data: JSON.parse(JSON.stringify(questions)),
     };
   } catch (error) {
     return handleError(error, "server");
