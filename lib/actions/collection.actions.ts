@@ -36,7 +36,7 @@ export async function toggleSaveQuestion(
   try {
     const question = await Question.findById(questionId);
 
-    if (question) {
+    if (!question) {
       throw new NotFoundError("Question");
     }
 

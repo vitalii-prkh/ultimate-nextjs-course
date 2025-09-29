@@ -16,6 +16,7 @@ import {Preview} from "@/components/editor/Preview";
 import {FormAnswer} from "@/components/forms/FormAnswer";
 import {AllAnswers} from "@/components/answers/AllAnswers";
 import {Votes} from "@/components/votes/Votes";
+import {SaveQuestion} from "@/components/questions/SaveQuestion";
 
 type PageQuestionProps = {
   params: Promise<{questionId: string}>;
@@ -74,6 +75,9 @@ async function PageQuestionById(props: PageQuestionProps) {
                 targetType={targetType}
                 targetId={targetId}
               />
+            </React.Suspense>
+            <React.Suspense fallback={<div>Loading...</div>}>
+              <SaveQuestion questionId={questionId} />
             </React.Suspense>
           </div>
         </div>
