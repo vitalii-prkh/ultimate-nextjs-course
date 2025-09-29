@@ -8,16 +8,10 @@ import {DataRenderer} from "@/components/DataRenderer";
 import {CardTagView} from "@/components/cards/CardTagView";
 
 export async function RightNav() {
-  const {
-    success: questionsSuccess,
-    data: questionsData,
-    error: questionsError,
-  } = await getHotQuestions();
-  const {
-    success: tagsSuccess,
-    data: tagsData,
-    error: tagsError,
-  } = await getTopTags();
+  const [
+    {success: questionsSuccess, data: questionsData, error: questionsError},
+    {success: tagsSuccess, data: tagsData, error: tagsError},
+  ] = await Promise.all([getHotQuestions(), getTopTags()]);
 
   return (
     <section className="custom-scrollar background-light900_dark200 light-border shadow-light-300 sticky top-0 right-0 flex h-screen w-[350px] flex-col gap-6 overflow-y-auto border-l p-6 pt-36 max-xl:hidden dark:shadow-none">
