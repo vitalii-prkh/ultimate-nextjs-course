@@ -377,10 +377,8 @@ export async function incrementViews(
   }
 }
 
-type TGetHotQuestionsData = Array<Omit<TQuestionJSON, "views" | "upvotes">>;
-
 export async function getHotQuestions(): Promise<
-  SuccessResponse<TGetHotQuestionsData> | FailureResponse
+  SuccessResponse<TQuestionJSON[]> | FailureResponse
 > {
   try {
     await dbConnect();

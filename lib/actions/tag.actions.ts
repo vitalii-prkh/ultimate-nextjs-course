@@ -6,6 +6,7 @@ import Question, {TQuestionJSON} from "@/db/question.model";
 import Tag, {TTagJSON} from "@/db/tag.model";
 import {TUserJSON} from "@/db/user.model";
 import {FILTERS} from "@/refs/filters";
+import dbConnect from "@/lib/mongoose";
 import {action} from "@/lib/handlers/action";
 import {
   schemaSearchParams,
@@ -164,3 +165,20 @@ export async function getTagQuestions(
     return handleError(error, "server");
   }
 }
+
+export const getTopTags = async (): Promise<
+  SuccessResponse<TTagJSON[]> | FailureResponse
+> => {
+  try {
+    await dbConnect();
+
+    const tags = await Tag.find().sort({questions: -1}).limit(5);
+
+    return {
+      success: true,
+      data: JSON.parse(JSON.stringify(tags)),
+    };
+  } catch (error) {
+    return handleError(error, "server");
+  }
+};

@@ -3,52 +3,34 @@ import Image from "next/image";
 import {ROUTES} from "@/refs/routes";
 import {buildPath} from "@/lib/path/buildPath";
 import {getHotQuestions} from "@/lib/actions/question.actions";
+import {getTopTags} from "@/lib/actions/tag.actions";
 import {DataRenderer} from "@/components/DataRenderer";
-import {CardTag} from "@/components/cards/CardTag";
-
-const tags = [
-  {
-    _id: "1",
-    name: "react",
-    questions: 100,
-  },
-  {
-    _id: "2",
-    name: "javascript",
-    questions: 100,
-  },
-  {
-    _id: "3",
-    name: "typescript",
-    questions: 100,
-  },
-  {
-    _id: "4",
-    name: "angular",
-    questions: 100,
-  },
-  {
-    _id: "5",
-    name: "vue",
-    questions: 100,
-  },
-];
+import {CardTagView} from "@/components/cards/CardTagView";
 
 export async function RightNav() {
-  const {success, data, error} = await getHotQuestions();
+  const {
+    success: questionsSuccess,
+    data: questionsData,
+    error: questionsError,
+  } = await getHotQuestions();
+  const {
+    success: tagsSuccess,
+    data: tagsData,
+    error: tagsError,
+  } = await getTopTags();
 
   return (
     <section className="custom-scrollar background-light900_dark200 light-border shadow-light-300 sticky top-0 right-0 flex h-screen w-[350px] flex-col gap-6 overflow-y-auto border-l p-6 pt-36 max-xl:hidden dark:shadow-none">
       <div>
         <h3 className="h3-bold text-dark200_light900">Top Questions</h3>
         <DataRenderer
-          data={data}
+          data={questionsData}
           empty={{
             title: "No questions found",
             message: "No questions have been asked yet.",
           }}
-          success={success}
-          error={error}
+          success={questionsSuccess}
+          error={questionsError}
           render={(questions) => (
             <div className="mt-7 flex w-full flex-col gap-[30px]">
               {questions.map(({_id, title}) => (
@@ -75,17 +57,29 @@ export async function RightNav() {
       </div>
       <div className="mt-16">
         <h3 className="h3-bold text-dark200_light900">Popular Tags</h3>
-        <div className="mt-7 flex flex-col gap-4">
-          {tags.map((tag) => (
-            <CardTag
-              key={tag._id}
-              _id={tag._id}
-              name={tag.name}
-              count={tag.questions}
-              compact
-            />
-          ))}
-        </div>
+        <DataRenderer
+          data={tagsData}
+          empty={{
+            title: "No tags found",
+            message: "No tags have been asked yet.",
+          }}
+          success={tagsSuccess}
+          error={tagsError}
+          render={(tags) => (
+            <div className="mt-7 flex flex-col gap-4">
+              {tags.map((tag) => (
+                <CardTagView
+                  key={tag._id}
+                  _id={tag._id}
+                  name={tag.name}
+                  questions={tag.questions}
+                  showCount
+                  compact
+                />
+              ))}
+            </div>
+          )}
+        />
       </div>
     </section>
   );
