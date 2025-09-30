@@ -4,6 +4,7 @@ import {notFound} from "next/navigation";
 import dayjs from "dayjs";
 import {auth} from "@/auth";
 import {EMPTY_ANSWERS, EMPTY_QUESTION, EMPTY_TAGS} from "@/refs/states";
+import {ROUTES} from "@/refs/routes";
 import {
   getUser,
   getUserAnswers,
@@ -11,6 +12,7 @@ import {
   getUserStats,
   getUserTopTags,
 } from "@/lib/actions/user.actions";
+import {buildPath} from "@/lib/path/buildPath";
 import {CardAnswer} from "@/components/cards/CardAnswer";
 import {CardQuestion} from "@/components/cards/CardQuestion";
 import {CardTagView} from "@/components/cards/CardTagView";
@@ -127,7 +129,7 @@ async function PageProfile(props: PageProfileProps) {
         </div>
         <div className="flex justify-end max-sm:mb-5 max-sm:w-full sm:mt-3">
           {loggedInUser?.user?.id === profileId && (
-            <Link href="/profile/edit">
+            <Link href={buildPath(ROUTES.PROFILE_UPDATE, {profileId})}>
               <Button className="paragraph-medium btn-secondary text-dark300_light900 min-h-12 min-w-44 px-4 py-3">
                 Edit Profile
               </Button>

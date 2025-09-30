@@ -14,6 +14,7 @@ import {
   schemaGetUserQuestions,
   schemaGetUserAnswers,
   schemaGetUserTags,
+  schemaProfile,
 } from "@/lib/validations";
 import {assignBadges} from "@/lib/utils";
 import {handleError} from "@/lib/handlers/error";
@@ -423,6 +424,43 @@ export async function getUserStats(
         totalQuestions: questionStats.count,
         totalAnswers: answerStats.count,
         badges,
+      },
+    };
+  } catch (error) {
+    return handleError(error, "server");
+  }
+}
+
+type TUpdateUserParams = z.infer<typeof schemaProfile>;
+
+type TUpdateUserData = {
+  data: TUserJSON;
+};
+
+export async function updateUser(
+  params: TUpdateUserParams,
+): Promise<SuccessResponse<TUpdateUserData> | FailureResponse> {
+  const validationResult = await action({
+    params,
+    schema: schemaProfile,
+    authorize: true,
+  });
+
+  if (validationResult instanceof Error) {
+    return handleError(validationResult, "server");
+  }
+
+  const {user} = validationResult.session!;
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(user?.id, params, {
+      new: true,
+    });
+
+    return {
+      success: true,
+      data: {
+        data: JSON.parse(JSON.stringify(updatedUser)),
       },
     };
   } catch (error) {

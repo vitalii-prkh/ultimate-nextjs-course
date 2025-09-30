@@ -6,6 +6,7 @@ export const ROUTES = {
   TAGS: "/tags",
   TAG_BY_ID: "/tags/[tagId]",
   PROFILE_BY_ID: "/profile/[profileId]",
+  PROFILE_UPDATE: "/profile/[profileId]/update",
   ASK_QUESTION: "/ask-question",
   QUESTIONS: "/questions",
   QUESTION_BY_ID: "/questions/[questionId]",
