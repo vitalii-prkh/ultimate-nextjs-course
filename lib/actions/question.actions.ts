@@ -1,5 +1,6 @@
 "use server";
 
+import React from "react";
 import mongoose, {FilterQuery, Types} from "mongoose";
 import {z} from "zod";
 import {revalidatePath} from "next/cache";
@@ -238,38 +239,40 @@ type TGetQuestionData = Omit<TQuestionJSON, "tags" | "author"> & {
   author: Pick<TUserJSON, "_id" | "name" | "image">;
 };
 
-export async function getQuestion(
-  params: TGetQuestionParams,
-): Promise<SuccessResponse<TGetQuestionData> | FailureResponse> {
-  const validationResult = await action({
-    params,
-    schema: schemaGetQuestion,
-    authorize: true,
-  });
+export const getQuestion = React.cache(
+  async (
+    params: TGetQuestionParams,
+  ): Promise<SuccessResponse<TGetQuestionData> | FailureResponse> => {
+    const validationResult = await action({
+      params,
+      schema: schemaGetQuestion,
+      authorize: true,
+    });
 
-  if (validationResult instanceof Error) {
-    return handleError(validationResult, "server");
-  }
-
-  const {questionId} = validationResult.params!;
-
-  try {
-    const question = await Question.findById(questionId)
-      .populate("tags")
-      .populate("author", "name image");
-
-    if (!question) {
-      throw new Error("Question not found");
+    if (validationResult instanceof Error) {
+      return handleError(validationResult, "server");
     }
 
-    return {
-      success: true,
-      data: JSON.parse(JSON.stringify(question)),
-    };
-  } catch (error) {
-    return handleError(error, "server");
-  }
-}
+    const {questionId} = validationResult.params!;
+
+    try {
+      const question = await Question.findById(questionId)
+        .populate("tags")
+        .populate("author", "name image");
+
+      if (!question) {
+        throw new Error("Question not found");
+      }
+
+      return {
+        success: true,
+        data: JSON.parse(JSON.stringify(question)),
+      };
+    } catch (error) {
+      return handleError(error, "server");
+    }
+  },
+);
 
 type TGetQuestionsParams = z.infer<typeof schemaSearchParams>;
 
