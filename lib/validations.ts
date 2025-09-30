@@ -233,3 +233,8 @@ export const schemaDeleteQuestion = z.object({
 export const schemaDeleteAnswer = z.object({
   answerId: z.string().min(1, "Answer ID is required"),
 });
+
+export const schemaGlobalSearch = z.object({
+  query: z.string(),
+  type: z.string().nullable().optional(),
+});

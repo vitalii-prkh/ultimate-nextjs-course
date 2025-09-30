@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import {auth} from "@/auth";
 import {UserAvatar} from "@/components/UserAvatar";
+import {GlobalSearch} from "@/components/search/GlobalSearch";
 import {ThemeToggle} from "./ThemeToggle";
 import {MobileNav} from "./MobileNav";
 
@@ -24,7 +25,7 @@ export async function Navbar() {
           Dev <span className="text-primary-500">Flow</span>
         </p>
       </Link>
-      <p>Global Search</p>
+      <GlobalSearch />
       <div className="flex-between gap-5">
         <ThemeToggle />
         {session?.user?.id && (
