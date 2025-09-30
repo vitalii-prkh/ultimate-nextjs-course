@@ -4,14 +4,17 @@ import mongoose, {FilterQuery, Types} from "mongoose";
 import {z} from "zod";
 import {revalidatePath} from "next/cache";
 import {after} from "next/server";
+import {auth} from "@/auth";
 import Question, {TQuestionHydrated, TQuestionJSON} from "@/db/question.model";
 import Tag, {TTagHydrated, TTagJSON} from "@/db/tag.model";
 import TagQuestion, {TTagQuestionData} from "@/db/tag-question.model";
 import Collection from "@/db/collection.model";
 import Vote from "@/db/vote.model";
 import Answer from "@/db/answer.model";
+import Interaction from "@/db/interaction.model";
 import {TUserJSON} from "@/db/user.model";
 import {FILTERS} from "@/refs/filters";
+import {ROUTES} from "@/refs/routes";
 import {action} from "@/lib/handlers/action";
 import {createInteraction} from "@/lib/actions/interaction.actions";
 import dbConnect from "@/lib/mongoose";
@@ -27,7 +30,6 @@ import {handleError} from "@/lib/handlers/error";
 import {FailureResponse, SuccessResponse} from "@/types/global";
 import {NotFoundError} from "@/lib/http-errors";
 import {buildPath} from "@/lib/path/buildPath";
-import {ROUTES} from "@/refs/routes";
 
 type TPostQuestionParams = Pick<TQuestionJSON, "title" | "content" | "tags">;
 
@@ -299,41 +301,53 @@ export async function getQuestions(
   const skip = Number(index) * limit;
   const filterQuery: FilterQuery<typeof Question> = {};
 
-  if (filter === FILTERS.RECOMMENDED) {
-    return {
-      success: true,
-      data: {
-        data: [],
-        isNext: false,
-      },
-    };
-  }
-
-  if (query) {
-    filterQuery.$or = [
-      {title: {$regex: query, $options: "i"}},
-      {content: {$regex: query, $options: "i"}},
-    ];
-  }
-
-  let sortCriteria = {};
-
-  switch (filter) {
-    case FILTERS.NEWEST:
-      sortCriteria = {createdAt: -1};
-      break;
-    case FILTERS.UNANSWERED:
-      filterQuery.answers = 0;
-      sortCriteria = {createdAt: -1};
-      break;
-    case FILTERS.POPULAR:
-      sortCriteria = {upvotes: -1};
-      break;
-    default:
-      sortCriteria = {createdAt: -1};
-  }
-
   try {
+    if (filter === FILTERS.RECOMMENDED) {
+      const session = await auth();
+      const userId = session?.user?.id;
+
+      if (!userId) {
+        return {
+          success: true,
+          data: {
+            data: [],
+            isNext: false,
+          },
+        };
+      }
+
+      return await getRecommendedQuestions({
+        userId,
+        query,
+        skip,
+        limit,
+      });
+    }
+
+    if (query) {
+      filterQuery.$or = [
+        {title: {$regex: query, $options: "i"}},
+        {content: {$regex: query, $options: "i"}},
+      ];
+    }
+
+    let sortCriteria = {};
+
+    switch (filter) {
+      case FILTERS.NEWEST:
+        sortCriteria = {createdAt: -1};
+        break;
+      case FILTERS.UNANSWERED:
+        filterQuery.answers = 0;
+        sortCriteria = {createdAt: -1};
+        break;
+      case FILTERS.POPULAR:
+        sortCriteria = {upvotes: -1};
+        break;
+      default:
+        sortCriteria = {createdAt: -1};
+    }
+
     const totalQuestions = await Question.countDocuments(filterQuery);
     const questions = await Question.find(filterQuery)
       .populate("tags", "name")
@@ -514,4 +528,82 @@ export async function deleteQuestion(
 
     return handleError(error, "server");
   }
+}
+
+type TGetRecommendedQuestionsParams = {
+  userId: string;
+  query?: string;
+  skip: number;
+  limit: number;
+};
+
+type TGetRecommendedQuestionsData = {
+  data: TQuestionInList[];
+  isNext: boolean;
+};
+
+export async function getRecommendedQuestions(
+  params: TGetRecommendedQuestionsParams,
+): Promise<SuccessResponse<TGetRecommendedQuestionsData> | FailureResponse> {
+  const {userId, query, skip, limit} = params;
+  const interactions = await Interaction.find({
+    user: new Types.ObjectId(userId),
+    actionType: "question",
+    action: {
+      $in: ["view", "upvote", "bookmark", "post"],
+    },
+  })
+    .sort({createdAt: -1})
+    .limit(50)
+    .lean();
+
+  const interactedQuestionIds = interactions.map((i) => i.actionId);
+  const interactedQuestions = await Question.find<TQuestionHydrated>({
+    _id: {
+      $in: interactedQuestionIds,
+    },
+  }).select("tags");
+
+  const allTags = interactedQuestions.flatMap((q) =>
+    q.tags.map((tag: Types.ObjectId) => tag.toString()),
+  );
+
+  const uniqueTagIds = [...new Set(allTags)];
+
+  const recommendedQuery: FilterQuery<typeof Question> = {
+    _id: {
+      $nin: interactedQuestionIds,
+    },
+    author: {
+      $ne: new Types.ObjectId(userId),
+    },
+    tags: {
+      $in: uniqueTagIds.map((id) => new Types.ObjectId(id)),
+    },
+  };
+
+  if (query) {
+    recommendedQuery.$or = [
+      {title: {$regex: query, $options: "i"}},
+      {content: {$regex: query, $options: "i"}},
+    ];
+  }
+
+  const total = await Question.countDocuments(recommendedQuery);
+
+  const questions = await Question.find(recommendedQuery)
+    .populate("tags", "name")
+    .populate("author", "name image")
+    .sort({upvotes: -1, views: -1})
+    .skip(skip)
+    .limit(limit)
+    .lean();
+
+  return {
+    success: true,
+    data: {
+      data: JSON.parse(JSON.stringify(questions)),
+      isNext: total > skip + questions.length,
+    },
+  };
 }

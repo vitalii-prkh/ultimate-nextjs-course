@@ -22,7 +22,7 @@ export function HomeTags(props: HomeTagsProps) {
     if (event.currentTarget.id === value) {
       setValue("");
 
-      const newUrl = remUrlQuery(searchParams.toString(), ["tag"]);
+      const newUrl = remUrlQuery(searchParams.toString(), ["filter"]);
 
       router.push(newUrl, {scroll: false});
     } else {
@@ -30,7 +30,7 @@ export function HomeTags(props: HomeTagsProps) {
 
       const newUrl = setUrlQuery(
         searchParams.toString(),
-        "tag",
+        "filter",
         event.currentTarget.id,
       );
 
