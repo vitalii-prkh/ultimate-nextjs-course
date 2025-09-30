@@ -68,6 +68,16 @@ export async function createAnswer(
     question.answers += 1;
 
     await question.save({session});
+
+    after(async () => {
+      await createInteraction({
+        action: "post",
+        actionId: newAnswer._id.toString(),
+        actionTarget: "answer",
+        authorId: userId!,
+      });
+    });
+
     await session.commitTransaction();
 
     revalidatePath(buildPath(ROUTES.QUESTION_BY_ID, {questionId}));

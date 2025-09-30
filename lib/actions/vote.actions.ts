@@ -17,7 +17,7 @@ import {
   schemaUpdateVoteCount,
 } from "@/lib/validations";
 import {createInteraction} from "@/lib/actions/interaction.actions";
-import {UnauthorizedError} from "@/lib/http-errors";
+import {NotFoundError, UnauthorizedError} from "@/lib/http-errors";
 import {SuccessResponse, FailureResponse} from "@/types/global";
 
 type TUpdateVoteCountParams = z.infer<typeof schemaUpdateVoteCount>;
@@ -87,7 +87,9 @@ export async function createVote(
     const contentDoc = await Model.findById(targetId).session(session);
 
     if (!contentDoc) {
-      throw new Error("Content not found");
+      throw new NotFoundError(
+        `${targetType[0].toUpperCase()}${targetType.slice(1)}`,
+      );
     }
 
     const contentAuthorId = contentDoc.author.toString();

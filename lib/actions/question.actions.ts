@@ -86,6 +86,15 @@ export async function createQuestion(
       {session},
     );
 
+    after(async () => {
+      await createInteraction({
+        action: "post",
+        actionId: question._id.toString(),
+        actionTarget: "question",
+        authorId: userId!,
+      });
+    });
+
     await session.commitTransaction();
 
     return {

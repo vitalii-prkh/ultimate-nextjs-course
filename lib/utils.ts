@@ -1,6 +1,7 @@
 import {clsx, type ClassValue} from "clsx";
 import {twMerge} from "tailwind-merge";
 import {DEV_ICONS_MAP, DEV_DESC_MAP} from "@/refs/dev-icons-map";
+import {BADGE_CRITERIA} from "@/refs/badges";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -58,4 +59,37 @@ export function formatNumber(number: number) {
   }
 
   return number.toString();
+}
+
+type AssignBadgesParams = {
+  criteria: Array<{
+    type: keyof typeof BADGE_CRITERIA;
+    count: number;
+  }>;
+};
+
+export function assignBadges(params: AssignBadgesParams) {
+  type BadgeLevel = keyof (typeof BADGE_CRITERIA)[keyof typeof BADGE_CRITERIA];
+
+  const badgeCounts: Record<BadgeLevel, number> = {
+    GOLD: 0,
+    SILVER: 0,
+    BRONZE: 0,
+  };
+
+  const {criteria} = params;
+
+  criteria.forEach((item) => {
+    const {type, count} = item;
+    const badgeLevels = BADGE_CRITERIA[type];
+    const levels = Object.keys(badgeLevels) as BadgeLevel[];
+
+    levels.forEach((level) => {
+      if (count >= badgeLevels[level]) {
+        badgeCounts[level] += 1;
+      }
+    });
+  });
+
+  return badgeCounts;
 }
